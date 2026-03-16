@@ -51,7 +51,7 @@
         .page {
             display: none;
             flex: 1;
-            padding: 2rem;
+            padding: 1.5rem;
             flex-direction: column;
             align-items: center;
             justify-content: center;
@@ -136,10 +136,22 @@
             background: var(--primary);
             border-radius: 50%;
             color: white;
+            flex-shrink: 0;
         }
+        .audio-btn-wrapper.sm { width: 48px; height: 48px; }
         .audio-btn-wrapper:hover { transform: scale(1.1); }
 
         .nav-text { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+        
+        .info-card {
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            border: 1px solid rgba(212, 163, 115, 0.3);
+            text-align: left;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
@@ -159,8 +171,8 @@
 
     <!-- Page 1: Listen to Story (1) -->
     <div class="page" id="page-1">
-        <h2 class="text-2xl font-bold mb-8 text-primary">이야기를 들어 보세요.</h2>
-        <img src="https://res.cloudinary.com/de76i94ia/image/upload/v1773594119/illust_1_aukvwo.png" alt="Illustration" class="w-full max-w-md h-auto rounded-xl shadow-lg mb-8">
+        <h2 class="text-2xl font-bold mb-6 text-primary">이야기를 들어 보세요.</h2>
+        <img src="https://res.cloudinary.com/de76i94ia/image/upload/v1773594119/illust_1_aukvwo.png" alt="Illustration" class="w-full max-w-sm md:max-w-md h-auto rounded-xl shadow-lg mb-6">
         <div class="audio-btn-wrapper" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1773593457/1-all_e1sk3j.wav', this)">
             <i class="ph ph-play text-3xl"></i>
         </div>
@@ -168,103 +180,102 @@
 
     <!-- Page 2: Vocabulary Match (2) -->
     <div class="page" id="page-2">
-        <h2 class="text-2xl font-bold mb-8 text-primary">Associez les mots coréens à leur traduction française.</h2>
+        <h2 class="text-xl md:text-2xl font-bold mb-8 text-primary">Associez les mots coréens à leur traduction française.</h2>
         <div class="matching-container">
             <div id="kor-list" class="flex flex-col gap-2"></div>
             <div id="fra-list" class="flex flex-col gap-2"></div>
         </div>
     </div>
 
-    <!-- Page 3: Story 1 (3) -->
+    <!-- Page 3: Story 1 + Grammar 1 Merged (3) -->
     <div class="page" id="page-3">
-        <div class="text-2xl mb-8 text-primary leading-loose">
+        <div class="text-xl md:text-2xl mb-4 text-primary leading-loose font-medium">
             옛날 하늘나라에는 <span class="highlight-text">'환인'이라는</span> 왕이 있었습니다.
         </div>
-        <div class="audio-btn-wrapper" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1773593321/1-1_fzntec.mp3', this)">
-            <i class="ph ph-play text-3xl"></i>
+        <div class="audio-btn-wrapper sm mb-4 mx-auto" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1773593321/1-1_fzntec.mp3', this)">
+            <i class="ph ph-play text-xl"></i>
         </div>
-        <p class="mt-8 text-gray-500 italic">Autrefois, dans le royaume céleste, il y avait un roi nommé 'Hwanin'.</p>
+        <p class="mb-6 text-sm md:text-base text-gray-500 italic">Autrefois, dans le royaume céleste, il y avait un roi nommé 'Hwanin'.</p>
+        
+        <div class="info-card max-w-xl">
+            <h3 class="text-lg font-bold mb-2 text-primary">문법 💡 N + (이)라는</h3>
+            <p class="text-sm md:text-base text-gray-700 leading-relaxed mb-3">Utilisé pour former une phrase subordonnée qui présente ou introduit un nouveau caractère ou un objet. Il se traduit souvent par «qui s’appelle» ou «qui est nommé».</p>
+            <ul class="text-sm md:text-base text-gray-600 list-disc list-inside space-y-1 text-left">
+                <li><span class="font-medium text-gray-800">‘환인’이라는 왕</span> - Un roi qui s’appelle Hwanin</li>
+                <li><span class="font-medium text-gray-800">‘민’이라는 선생님</span> - Un professeur qui s’appelle Min</li>
+                <li><span class="font-medium text-gray-800">‘제니’라는 가수</span> - Une chanteuse qui s’appelle Jenny</li>
+            </ul>
+        </div>
     </div>
 
-    <!-- Page 4: Grammar 1 (4) -->
+    <!-- Page 4: Story 2 (4) -->
     <div class="page" id="page-4">
-        <div class="text-center max-w-xl">
-            <h3 class="text-2xl font-bold mb-6 text-primary">문법 💡 N + (이)라는</h3>
-            <p class="text-lg text-gray-700 leading-relaxed">Utilisé pour former une phrase subordonnée qui présente ou introduit un nouveau caractère ou un objet. Il se traduit souvent par «qui s’appelle» ou «qui est nommé».</p>
-        </div>
-    </div>
-
-    <!-- Page 5: Story 2 (5) -->
-    <div class="page" id="page-5">
-        <div class="text-2xl mb-8 text-primary leading-loose">
+        <div class="text-xl md:text-2xl mb-8 text-primary leading-loose font-medium">
             환인의 아들 '환웅'은 하늘 아래 인간 세상에 관심이 아주 많았습니다.
         </div>
-        <div class="audio-btn-wrapper" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1773593321/1-2_dpxhbj.mp3', this)">
+        <div class="audio-btn-wrapper mb-8 mx-auto" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1773593321/1-2_dpxhbj.mp3', this)">
             <i class="ph ph-play text-3xl"></i>
         </div>
-        <p class="mt-8 text-gray-500 italic">Hwanung, le fils de Hwanin, s'intéressait beaucoup au monde des humains sous le ciel.</p>
+        <p class="mt-4 text-sm md:text-base text-gray-500 italic">Hwanung, le fils de Hwanin, s'intéressait beaucoup au monde des humains sous le ciel.</p>
     </div>
 
-    <!-- Page 6: Story 3 (6) -->
+    <!-- Page 5: Story 3 + Vocab + Grammar 2 Merged (5) -->
+    <div class="page" id="page-5">
+        <div class="text-lg md:text-xl mb-3 text-primary leading-relaxed font-medium">
+            환인은 태백산을 <span class="text-blue-600 font-bold cursor-pointer border-b-2 border-dashed border-blue-600 hover:opacity-70 transition-opacity" onclick="openPopup('vocab-popup')">내려다보았고</span>, 그곳이 나라를 <span class="highlight-text">세우기에 좋은</span> 곳이라고 생각했습니다.
+        </div>
+        <div class="audio-btn-wrapper sm mb-3 mx-auto" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1773593322/1-3_ynnljv.mp3', this)">
+            <i class="ph ph-play text-xl"></i>
+        </div>
+        <p class="mb-4 text-xs md:text-sm text-gray-500 italic">Hwanin a contemplé le mont Taebaek et a pensé que c'était un bon endroit pour fonder un pays.</p>
+        
+        <div class="flex flex-col gap-3 w-full max-w-xl mx-auto">
+            <div class="info-card">
+                <h3 class="text-base font-bold mb-2 text-primary">문법 💡 V + -기에 좋다</h3>
+                <p class="text-xs md:text-sm text-gray-700 leading-relaxed mb-2">Indique que le sujet est approprié pour réaliser une action spécifique. « -에 » peut être omis dans un discours ou un texte moins formel.</p>
+                <ul class="text-xs md:text-sm text-gray-600 list-disc list-inside space-y-1 text-left">
+                    <li><span class="font-medium text-gray-800">나라를 세우기에 좋은 곳</span> - Un bon endroit pour fonder un pays</li>
+                    <li><span class="font-medium text-gray-800">이 비누는 손을 씻기에 좋아요.</span> - Ce savon est bon pour se laver les mains.</li>
+                    <li><span class="font-medium text-gray-800">보기 좋은 그림</span> - Une image qui est agréable à voir (Une belle image)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page 6: Story 4 + Grammar 3 Merged (6) -->
     <div class="page" id="page-6">
-        <div class="text-2xl mb-8 text-primary leading-loose">
-            환인은 태백산을 <span class="highlight-text">내려다보았고</span>, 그곳이 나라를 <span class="highlight-text">세우기에 좋은</span> 곳이라고 생각했습니다.
-        </div>
-        <div class="audio-btn-wrapper" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1773593322/1-3_ynnljv.mp3', this)">
-            <i class="ph ph-play text-3xl"></i>
-        </div>
-        <p class="mt-8 text-gray-500 italic">Hwanin a contemplé le mont Taebaek et a pensé que c'était un bon endroit pour fonder un pays.</p>
-    </div>
-
-    <!-- Page 7: Vocab Note (7) -->
-    <div class="page" id="page-7">
-        <div class="text-center max-w-xl">
-            <h3 class="text-2xl font-bold mb-6 text-primary">어휘 ✏️ 내려다보다</h3>
-            <p class="text-lg text-gray-700 leading-relaxed">Le verbe « 내리다 » indique un mouvement qui va de haut en bas. Dans ce mot, il est utilisé comme un préfixe pour exprimer le fait de regarder quelque chose qui se trouve plus bas.</p>
-        </div>
-    </div>
-
-    <!-- Page 8: Grammar 2 (8) -->
-    <div class="page" id="page-8">
-        <div class="text-center max-w-xl">
-            <h3 class="text-2xl font-bold mb-6 text-primary">문법 💡 V + -기에 좋다</h3>
-            <p class="text-lg text-gray-700 leading-relaxed">Indique que le sujet est approprié pour réaliser une action spécifique.</p>
-        </div>
-    </div>
-
-    <!-- Page 9: Story 4 (9) -->
-    <div class="page" id="page-9">
-        <div class="text-2xl mb-8 text-primary leading-loose">
+        <div class="text-xl md:text-2xl mb-4 text-primary leading-loose font-medium">
             환인은 아들에게 보물 세 개를 주며 내려가서 인간 세상을 <span class="highlight-text">다스리라고 했습니다</span>.
         </div>
-        <div class="audio-btn-wrapper" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1773593323/1-4_iqrzkq.mp3', this)">
-            <i class="ph ph-play text-3xl"></i>
+        <div class="audio-btn-wrapper sm mb-4 mx-auto" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1773593323/1-4_iqrzkq.mp3', this)">
+            <i class="ph ph-play text-xl"></i>
         </div>
-        <p class="mt-8 text-gray-500 italic">Hwanin a donné trois trésors à son fils et lui a dit de descendre pour gouverner le monde des humains.</p>
+        <p class="mb-6 text-sm md:text-base text-gray-500 italic">Hwanin a donné trois trésors à son fils et lui a dit de descendre pour gouverner le monde des humains.</p>
+        
+        <div class="info-card max-w-xl">
+            <h3 class="text-lg font-bold mb-2 text-primary">문법 💡 V + -(으)라고 하다</h3>
+            <p class="text-sm md:text-base text-gray-700 leading-relaxed mb-3">Forme du discours rapporté utilisé pour transmettre un ordre ou un conseil.</p>
+            <ul class="text-sm md:text-base text-gray-600 list-disc list-inside space-y-1 text-left">
+                <li><span class="font-medium text-gray-800">환인은 아들에게 인간 세상을 다스리라고 했습니다.</span> - Hwanin a dit son fils de gouverner le monde des humains.</li>
+                <li><span class="font-medium text-gray-800">엄마가 일찍 자라고 했어요.</span> - Maman m'a dit d'aller me coucher tôt.</li>
+            </ul>
+        </div>
     </div>
 
-    <!-- Page 10: Grammar 3 (10) -->
-    <div class="page" id="page-10">
-        <div class="text-center max-w-xl">
-            <h3 class="text-2xl font-bold mb-6 text-primary">문법 💡 V + -(으)라고 하다</h3>
-            <p class="text-lg text-gray-700 leading-relaxed">Forme du discours rapporté utilisé pour transmettre un ordre ou un conseil (impératif).</p>
-        </div>
-    </div>
-
-    <!-- Page 11: Review (11) -->
-    <div class="page" id="page-11">
-        <h2 class="text-xl font-bold mb-6 text-primary">이야기를 다시 한 번 읽어 보세요.</h2>
-        <div class="bg-white p-6 rounded-xl shadow-inner text-left text-lg leading-relaxed mb-6 max-w-2xl border border-secondary/20">
+    <!-- Page 7: Review (7) -->
+    <div class="page" id="page-7">
+        <h2 class="text-xl md:text-3xl font-bold mb-6 text-primary">이야기를 다시 한 번 읽어 보세요.</h2>
+        <div class="bg-white p-6 md:p-10 rounded-xl shadow-inner text-left text-base md:text-xl lg:text-2xl leading-loose mb-6 max-w-3xl border border-secondary/20">
             옛날 하늘나라에는 '환인'이라는 왕이 있었습니다. 환인의 아들 '환웅'은 하늘 아래 인간 세상에 관심이 아주 많았습니다. 환인은 태백산을 내려다보았고, 그곳이 나라를 세우기에 좋은 곳이라고 생각했습니다. 환인은 아들에게 보물 세 개를 주며 내려가서 인간 세상을 다스리라고 했습니다.
         </div>
-        <div class="audio-btn-wrapper" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1773593457/1-all_e1sk3j.wav', this)">
+        <div class="audio-btn-wrapper mx-auto" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1773593457/1-all_e1sk3j.wav', this)">
             <i class="ph ph-play text-3xl"></i>
         </div>
     </div>
 
-    <!-- Quiz Pages 12~16 -->
-    <div class="page" id="page-12">
-        <h3 class="text-2xl font-bold mb-8">하늘의 왕은 이름이 뭐예요?</h3>
+    <!-- Quiz Pages 8~12 -->
+    <div class="page" id="page-8">
+        <h3 class="text-xl md:text-2xl font-bold mb-8">하늘의 왕은 이름이 뭐예요?</h3>
         <div class="flex flex-col w-full items-center gap-2">
             <button onclick="checkQuiz(this, true)" class="quiz-option">환인</button>
             <button onclick="checkQuiz(this, false)" class="quiz-option">환웅</button>
@@ -272,8 +283,8 @@
         </div>
     </div>
 
-    <div class="page" id="page-13">
-        <h3 class="text-2xl font-bold mb-8">환인은 환웅에게 무엇을 줬어요?</h3>
+    <div class="page" id="page-9">
+        <h3 class="text-xl md:text-2xl font-bold mb-8">환인은 환웅에게 무엇을 줬어요?</h3>
         <div class="flex flex-col w-full items-center gap-2">
             <button onclick="checkQuiz(this, false)" class="quiz-option">친구</button>
             <button onclick="checkQuiz(this, false)" class="quiz-option">돈</button>
@@ -281,63 +292,69 @@
         </div>
     </div>
 
-    <div class="page" id="page-14">
+    <div class="page" id="page-10">
         <p class="mb-4 text-gray-500">Il y avait un roi nommé 'Sejong'.</p>
-        <h3 class="text-2xl font-bold mb-8">'세종'___ 왕이 있었습니다.</h3>
+        <h3 class="text-xl md:text-2xl font-bold mb-8">'세종'___ 왕이 있었습니다.</h3>
         <div class="flex flex-col w-full items-center gap-2">
             <button onclick="checkQuiz(this, false)" class="quiz-option">은</button>
             <button onclick="checkQuiz(this, false)" class="quiz-option">이라고</button>
-            <button onclick="checkQuiz(this, true, 'pop-14')" class="quiz-option">이라는</button>
+            <button onclick="checkQuiz(this, true, 'pop-10')" class="quiz-option">이라는</button>
             <button onclick="checkQuiz(this, false)" class="quiz-option">부르는</button>
         </div>
     </div>
 
-    <div class="page" id="page-15">
+    <div class="page" id="page-11">
         <p class="mb-4 text-gray-500">La Corée est un bon pays pour vivre.</p>
-        <h3 class="text-2xl font-bold mb-8">한국은 ___ 좋은 나라예요.</h3>
+        <h3 class="text-xl md:text-2xl font-bold mb-8">한국은 ___ 좋은 나라예요.</h3>
         <div class="flex flex-col w-full items-center gap-2">
             <button onclick="checkQuiz(this, false)" class="quiz-option">살기 위해</button>
-            <button onclick="checkQuiz(this, true, 'pop-15')" class="quiz-option">살기에</button>
+            <button onclick="checkQuiz(this, true, 'pop-11')" class="quiz-option">살기에</button>
             <button onclick="checkQuiz(this, false)" class="quiz-option">살고자</button>
             <button onclick="checkQuiz(this, false)" class="quiz-option">살려고</button>
         </div>
     </div>
 
-    <div class="page" id="page-16">
+    <div class="page" id="page-12">
         <p class="mb-4 text-gray-500">Le roi a dit son fils d’établir un pays.</p>
-        <h3 class="text-2xl font-bold mb-8">왕은 아들에게 나라를 ____ 했습니다.</h3>
+        <h3 class="text-xl md:text-2xl font-bold mb-8">왕은 아들에게 나라를 ____ 했습니다.</h3>
         <div class="flex flex-col w-full items-center gap-2">
-            <button onclick="checkQuiz(this, true, 'pop-16')" class="quiz-option">세우라고</button>
+            <button onclick="checkQuiz(this, true, 'pop-12')" class="quiz-option">세우라고</button>
             <button onclick="checkQuiz(this, false)" class="quiz-option">세우자고</button>
             <button onclick="checkQuiz(this, false)" class="quiz-option">세우냐고</button>
             <button onclick="checkQuiz(this, false)" class="quiz-option">세워라고</button>
         </div>
     </div>
 
-    <!-- Outro -->
-    <div class="page" id="page-17">
+    <!-- Outro (13) -->
+    <div class="page" id="page-13">
         <div class="mb-6 text-accent"><i class="ph ph-sparkle text-6xl"></i></div>
         <div class="bg-white p-8 rounded-2xl mb-10 max-w-lg shadow-sm">
             오늘 이야기가 재미있었나요? 제2장으로 가서 땅에 내려간 환웅이 무엇을 하는지 알아보세요!
-            <p class="mt-4 text-gray-500 italic">Avez-vous aimé l'histoire d'aujourd'hui ? Passez au chapitre 2 pour découvrir ce que fait Hwanung après être descendu sur la terre !</p>
+            <p class="mt-4 text-gray-500 italic text-sm md:text-base">Avez-vous aimé l'histoire d'aujourd'hui ? Passez au chapitre 2 pour découvrir ce que fait Hwanung après être descendu sur la terre !</p>
         </div>
     </div>
 
     <!-- Popups -->
-    <div id="pop-14" class="popup">
-        <h4 class="font-bold text-lg mb-2">문법 💡 N + (이)라는</h4>
+    <div id="vocab-popup" class="popup">
+        <h4 class="font-bold text-lg mb-2 text-primary">어휘 ✏️ 내려다보다</h4>
+        <p class="text-sm text-gray-700 leading-relaxed mb-4 text-left">Le verbe « 내리다 » indique un mouvement qui va de haut en bas. Dans ce mot, il est utilisé comme un préfixe pour exprimer le fait de regarder quelque chose qui se trouve plus bas.</p>
+        <button onclick="closePopup('vocab-popup')" class="btn-primary w-full justify-center">Fermer</button>
+    </div>
+
+    <div id="pop-10" class="popup">
+        <h4 class="font-bold text-lg mb-2 text-primary">문법 💡 N + (이)라는</h4>
         <p class="text-sm">Utilisé pour présenter ou introduire un nouveau caractère ou un objet. Il se traduit souvent par «qui s’appelle» ou «qui est nommé».</p>
-        <button onclick="closePopup('pop-14')" class="mt-6 btn-primary w-full justify-center">Continuer</button>
+        <button onclick="closePopup('pop-10')" class="mt-6 btn-primary w-full justify-center">Fermer</button>
     </div>
-    <div id="pop-15" class="popup">
-        <h4 class="font-bold text-lg mb-2">문법 💡 V + -기에 좋다</h4>
+    <div id="pop-11" class="popup">
+        <h4 class="font-bold text-lg mb-2 text-primary">문법 💡 V + -기에 좋다</h4>
         <p class="text-sm">Indique que le sujet est approprié pour réaliser une action spécifique.</p>
-        <button onclick="closePopup('pop-15')" class="mt-6 btn-primary w-full justify-center">Continuer</button>
+        <button onclick="closePopup('pop-11')" class="mt-6 btn-primary w-full justify-center">Fermer</button>
     </div>
-    <div id="pop-16" class="popup">
-        <h4 class="font-bold text-lg mb-2">문법 💡 V + -(으)라고 하다</h4>
+    <div id="pop-12" class="popup">
+        <h4 class="font-bold text-lg mb-2 text-primary">문법 💡 V + -(으)라고 하다</h4>
         <p class="text-sm">Forme du discours rapporté utilisé pour transmettre un ordre ou un conseil (impératif).</p>
-        <button onclick="closePopup('pop-16')" class="mt-6 btn-primary w-full justify-center">Continuer</button>
+        <button onclick="closePopup('pop-12')" class="mt-6 btn-primary w-full justify-center">Fermer</button>
     </div>
 
     <!-- Nav -->
@@ -346,7 +363,7 @@
             <i class="ph ph-caret-left text-2xl"></i>
             <span class="nav-text">Précédent</span>
         </button>
-        <span id="pageCounter" class="text-sm font-bold text-gray-400">1 / 18</span>
+        <span id="pageCounter" class="text-sm font-bold text-gray-400">1 / 14</span>
         <button id="nextBtn" onclick="nextPage()" class="flex flex-col items-center text-primary disabled:opacity-20 px-4">
             <i class="ph ph-caret-right text-2xl"></i>
             <span class="nav-text">Suivant</span>
@@ -356,7 +373,7 @@
 
 <script>
     let currentPage = 0;
-    const totalPages = 17;
+    const totalPages = 13;
     let currentAudio = null;
     let synth, successSynth, failSynth;
 
@@ -368,14 +385,18 @@
     let selectedFra = null;
     let matchesFound = 0;
 
-    // 페이지별 오디오 맵
+    // 퀴즈 통과 여부 기록 객체
+    let quizState = {};
+    let isPopupOpen = false;
+
+    // 페이지 번호 변경에 맞춘 오디오 맵 업데이트
     const audioMap = {
         1: 'https://res.cloudinary.com/de76i94ia/video/upload/v1773593457/1-all_e1sk3j.wav',
         3: 'https://res.cloudinary.com/de76i94ia/video/upload/v1773593321/1-1_fzntec.mp3',
-        5: 'https://res.cloudinary.com/de76i94ia/video/upload/v1773593321/1-2_dpxhbj.mp3',
-        6: 'https://res.cloudinary.com/de76i94ia/video/upload/v1773593322/1-3_ynnljv.mp3',
-        9: 'https://res.cloudinary.com/de76i94ia/video/upload/v1773593323/1-4_iqrzkq.mp3',
-        11: 'https://res.cloudinary.com/de76i94ia/video/upload/v1773593457/1-all_e1sk3j.wav'
+        4: 'https://res.cloudinary.com/de76i94ia/video/upload/v1773593321/1-2_dpxhbj.mp3',
+        5: 'https://res.cloudinary.com/de76i94ia/video/upload/v1773593322/1-3_ynnljv.mp3',
+        6: 'https://res.cloudinary.com/de76i94ia/video/upload/v1773593323/1-4_iqrzkq.mp3',
+        7: 'https://res.cloudinary.com/de76i94ia/video/upload/v1773593457/1-all_e1sk3j.wav'
     };
 
     window.onload = function() {
@@ -392,15 +413,25 @@
 
     function toggleAudio(url, btn) {
         const icon = btn.querySelector('i');
+        const isSmall = btn.classList.contains('sm');
+        const playClass = isSmall ? 'ph ph-play text-xl' : 'ph ph-play text-3xl';
+        const pauseClass = isSmall ? 'ph ph-pause text-xl' : 'ph ph-pause text-3xl';
+
         if (currentAudio && !currentAudio.paused && currentAudio.src === url) {
             currentAudio.pause();
-            icon.className = 'ph ph-play text-3xl';
+            icon.className = playClass;
         } else {
             if (currentAudio) currentAudio.pause();
+            
+            // 모든 다른 오디오 버튼 상태 초기화
+            document.querySelectorAll('.audio-btn-wrapper i').forEach(i => {
+                i.className = i.parentElement.classList.contains('sm') ? 'ph ph-play text-xl' : 'ph ph-play text-3xl';
+            });
+
             currentAudio = new Audio(url);
             currentAudio.play();
-            icon.className = 'ph ph-pause text-3xl';
-            currentAudio.onended = () => icon.className = 'ph ph-play text-3xl';
+            icon.className = pauseClass;
+            currentAudio.onended = () => icon.className = playClass;
         }
     }
 
@@ -441,22 +472,28 @@
         document.getElementById('pageCounter').innerText = `${currentPage + 1} / ${totalPages + 1}`;
         
         const navBar = document.getElementById('navBar');
-        // 표지와 마지막 완료 페이지에서는 하단바를 숨김
         navBar.style.display = (currentPage === 0 || currentPage === totalPages) ? 'none' : 'flex';
+        
+        // 팝업이 열려있을 때는 강제로 하단 버튼 비활성화
+        if (isPopupOpen) {
+            document.getElementById('prevBtn').disabled = true;
+            document.getElementById('nextBtn').disabled = true;
+            return; 
+        }
+
         document.getElementById('prevBtn').disabled = (currentPage === 0);
         
-        // 매칭 페이지 완료 전까지 다음 버튼 비활성화
         if (currentPage === 2 && matchesFound < korWords.length) {
+            document.getElementById('nextBtn').disabled = true;
+        } else if (currentPage >= 8 && currentPage <= 12 && !quizState[currentPage]) {
+            // 8~12페이지(퀴즈)에서 정답을 맞추지 않았을 때 다음 버튼 비활성화
             document.getElementById('nextBtn').disabled = true;
         } else {
             document.getElementById('nextBtn').disabled = (currentPage === totalPages);
         }
 
-        // 마지막 페이지 도착 시 완료 이벤트 자동 발생
         if (currentPage === totalPages && !window.lessonCompleted) {
             window.lessonCompleted = true;
-            
-            // 일반 퀴즈 정답 효과음과 구분되는 화려한 아르페지오 완료 효과음
             if (successSynth) {
                 const now = Tone.now();
                 successSynth.triggerAttackRelease("C5", "8n", now);
@@ -469,13 +506,18 @@
     }
 
     function checkQuiz(btn, isCorrect, popupId) {
+        if (quizState[currentPage]) return; // 이미 퀴즈를 맞췄다면 중복 클릭 방지
+
         if (isCorrect) {
             btn.classList.add('correct');
             if (successSynth) successSynth.triggerAttackRelease(["C5", "E5", "G5"], "8n");
+            
+            quizState[currentPage] = true; // 현재 페이지 퀴즈 통과 기록
+
             if (popupId) {
-                setTimeout(() => document.getElementById(popupId).style.display = 'block', 500);
+                setTimeout(() => openPopup(popupId), 500);
             } else {
-                setTimeout(nextPage, 800);
+                updatePage(); // 팝업이 없는 퀴즈의 경우 즉시 Suivant 활성화
             }
         } else {
             btn.classList.add('wrong');
@@ -484,9 +526,16 @@
         }
     }
 
+    function openPopup(id) {
+        isPopupOpen = true;
+        document.getElementById(id).style.display = 'block';
+        updatePage(); // 하단 버튼 비활성화 로직 실행
+    }
+
     function closePopup(id) {
+        isPopupOpen = false;
         document.getElementById(id).style.display = 'none';
-        nextPage();
+        updatePage(); // 하단 버튼 정상화 로직 실행
     }
 
     function initMatching() {
@@ -519,25 +568,18 @@
 
         if (selectedKor && selectedFra) {
             if (correctMatches[selectedKor.innerText] === selectedFra.innerText) {
-                // 단어 쌍 정답 처리
                 selectedKor.className = 'match-item matched';
                 selectedFra.className = 'match-item matched';
                 matchesFound++;
                 
-                // 단어 쌍 맞출 때마다 정답 효과음 재생
                 if (successSynth) successSynth.triggerAttackRelease(["C5", "E5", "G5"], "8n");
                 
                 if (matchesFound === korWords.length) {
-                    // 모든 쌍을 맞췄을 경우 다음 버튼 활성화 (페이지 강제 전환 방지)
                     document.getElementById('nextBtn').disabled = false;
                 }
             } else {
-                // 단어 쌍 오답 처리
                 const k = selectedKor, f = selectedFra;
-                
-                // 단어 쌍 틀릴 때마다 오답 효과음 재생
                 if (failSynth) failSynth.triggerAttackRelease("C3", "8n", "+0", 0.5);
-                
                 setTimeout(() => {
                     k.classList.remove('selected');
                     f.classList.remove('selected');
