@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>단군신화 제2장: 땅으로 내려온 환웅</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4a3728;
+            --secondary: #d4a373;
+            --accent: #bc6c25;
+            --bg-light: #fefae0;
+            --highlight: #e63946;
+        }
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #1a1a1a;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            width: 100vw;
+        }
+        #app-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 100vh * (16/9); 
+            aspect-ratio: 16/9;
+            background-color: var(--bg-light);
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        @media (max-aspect-ratio: 1/1) {
+            #app-container {
+                aspect-ratio: 9/16;
+                max-width: 100vw;
+                max-height: calc(100vw * (16/9));
+            }
+        }
+
+        .page {
+            display: none;
+            flex: 1;
+            padding: clamp(1rem, 3vh, 2rem);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            animation: fadeIn 0.4s ease-out;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+        }
+        .page.active { display: flex; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        .quiz-option {
+            width: 100%;
+            padding: clamp(0.5rem, 2vh, 1rem);
+            background: white;
+            border: 2px solid var(--secondary);
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+        }
+        .quiz-option.correct { background: #4ade80; border-color: #22c55e; color: white; }
+        .quiz-option.wrong { background: #f87171; border-color: #ef4444; color: white; }
+
+        .matching-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(0.4rem, 1.5vh, 0.75rem);
+            width: 100%;
+            max-width: 600px;
+        }
+        .match-item {
+            padding: clamp(0.5rem, 1.5vh, 0.75rem);
+            background: white;
+            border: 2px solid var(--secondary);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            user-select: none;
+            font-size: 0.95rem;
+        }
+        .match-item.selected { background: var(--secondary); color: white; }
+        .match-item.matched { background: #e2e8f0; color: #94a3b8; border-color: #cbd5e1; cursor: default; }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(0,0,0,0.05);
+            width: 100%;
+            position: absolute; top: 0; left: 0; z-index: 10;
+        }
+        .progress-inner { height: 100%; background: var(--accent); transition: width 0.3s ease; }
+
+        .popup {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: white; padding: 2rem; border-radius: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            z-index: 100; display: none; width: 85%; max-width: 400px;
+            border: 2px solid var(--secondary);
+        }
+
+        .highlight-text { color: var(--highlight); font-weight: 700; }
+
+        /* 오디오 버튼 이미지 스타일 */
+        .audio-btn-wrapper {
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 64px; height: 64px;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--primary);
+            border-radius: 50%;
+            color: white;
+            flex-shrink: 0;
+        }
+        .audio-btn-wrapper.sm { width: 48px; height: 48px; }
+        .audio-btn-wrapper:hover { transform: scale(1.1); }
+
+        .nav-text { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+        
+        .info-card {
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            border: 1px solid rgba(212, 163, 115, 0.3);
+            text-align: left;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    <div class="progress-bar"><div id="progress" class="progress-inner" style="width: 0%"></div></div>
+
+    <!-- Cover Page (0) -->
+    <div class="page active" id="page-0">
+        <div class="mb-2 text-accent font-bold tracking-widest text-sm">Le mythe de Dangun</div>
+        <h1 class="text-4xl md:text-6xl font-bold text-primary mb-4">제2장: 땅으로 내려온 환웅</h1>
+        <p class="text-xl text-gray-600 mb-10">Hwanung descendant sur terre</p>
+        <button onclick="nextPage()" class="btn-primary px-10 py-4">
+            Commencer <i class="ph ph-play-circle text-2xl"></i>
+        </button>
+    </div>
+
+    <!-- Page 1: Listen to Story (1) -->
+    <div class="page" id="page-1">
+        <h2 class="text-2xl font-bold mb-6 text-primary">이야기를 들어 보세요.</h2>
+        <img src="https://res.cloudinary.com/de76i94ia/image/upload/v1773682431/illust_2_bahmyy.png" alt="Illustration" class="w-full max-w-sm md:max-w-md h-auto rounded-xl shadow-lg mb-6">
+        <div class="audio-btn-wrapper" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1773682429/2-all_al3wmr.wav', this)">
+            <i class="ph ph-play text-3xl"></i>
+        </div>
+    </div>
+
+    <!-- Page 2: Vocabulary Match (2) -->
+    <div class="page" id="page-2">
+        <h2 class="text-xl md:text-2xl font-bold mb-6 text-primary">Associez les mots coréens à leur traduction française.</h2>
+        <div class="matching-container">
+            <div id="kor-list" class="flex flex-col gap-1.5"></div>
+            <div id="fra-list" class="flex flex-col gap-1.5"></div>
+        </div>
+    </div>
+
+    <!-- Page 3: Story 1 (3) -->
+    <div class="page" id="page-3">
+        <div class="text-xl md:text-2xl mb-4 text-primary leading-loose font-medium">
+            환웅은 3,000명의 신하들과 함께 태백산 정상으로 내려왔습니다.
+        </div>
+        <div class="audio-btn-wrapper sm mb-4 mx-auto" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1773682423/2-1_efvwmp.mp3', this)">
+            <i class="ph ph-play text-xl"></i>
+        </div>
+        <p class="mb-6 text-sm md:text-base text-gray-500 italic">Hwanung est descendu au sommet du mont Taebaek avec 3 000 sujets.</p>
+    </div>
+
+    <!-- Page 4: Story 2 + Vocab Merged (4) -->
+    <div class="page" id="page-4">
+        <div class="text-lg md:text-xl mb-3 text-primary leading-relaxed font-medium">
+            이곳에서 바람의 신, 비의 신, 구름의 신을 데리고 농사, 생명, 병, 벌 등 인간 세상의 360<span class="text-blue-600 font-bold cursor-pointer border-b-2 border-dashed border-blue-600 hover:opacity-70 transition-opacity" onclick="openPopup('vocab-popup-1')">여 가지</span> 일을 <span class="text-blue-600 font-bold cursor-pointer border-b-2 border-dashed border-blue-600 hover:opacity-70 transition-opacity" onclick="openPopup('vocab-popup-2')">돌보았습니다</span>.
+        </div>
+        <div class="audio-btn-wrapper sm mb-3 mx-auto" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1773682424/2-2_fgutrk.mp3', this)">
+            <i class="ph ph-play text-xl"></i>
+        </div>
+        <p class="mb-4 text-xs md:text-sm text-gray-500 italic">Ici, accompagné du dieu du vent, du dieu de la pluie et du dieu des nuages, il s'est occupé de plus de 360 types de choses dans le monde des humains, telles que l'agriculture, la vie, la maladie et la punition.</p>
+    </div>
+
+    <!-- Page 5: Story 3 + Grammar 2 Merged (5) -->
+    <div class="page" id="page-5">
+        <div class="text-xl md:text-2xl mb-4 text-primary leading-loose font-medium">
+            환웅은 사람들이 올바르게 살 수 <span class="highlight-text">있도록</span> 세상을 가르치고 다스렸습니다.
+        </div>
+        <div class="audio-btn-wrapper sm mb-4 mx-auto" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1773682426/2-3_ktu7ud.mp3', this)">
+            <i class="ph ph-play text-xl"></i>
+        </div>
+        <p class="mb-6 text-sm md:text-base text-gray-500 italic">Hwanung a enseigné et gouverné le monde afin que les gens puissent vivre correctement.</p>
+        
+        <div class="info-card max-w-xl">
+            <h3 class="text-lg font-bold mb-2 text-primary">문법 💡 V + -도록</h3>
+            <p class="text-sm md:text-base text-gray-700 leading-relaxed mb-3">Indique un but ou un résultat souhaité, se traduisant par « afin de » ou « pour que ».</p>
+            <ul class="text-sm md:text-base text-gray-600 list-disc list-inside space-y-1 text-left">
+                <li><span class="font-medium text-gray-800">환웅은 사람들이 올바르게 살 수 있도록 가르쳤습니다.</span> - Hwanung a enseigné les gens afin qu’ils puissent vivre correctement.</li>
+                <li><span class="font-medium text-gray-800">병이 낫도록 약을 드세요.</span> - Prenez vos médicaments pour que votre maladie se guérisse.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Page 6: Review (6) -->
+    <div class="page" id="page-6">
+        <h2 class="text-xl md:text-3xl font-bold mb-4 md:mb-6 text-primary">이야기를 다시 한 번 읽어 보세요.</h2>
+        <div class="bg-white p-6 md:p-10 rounded-xl shadow-inner text-left text-sm md:text-xl lg:text-2xl leading-loose mb-6 max-w-3xl border border-secondary/20">
+            환웅은 3,000명의 신하들과 함께 태백산 정상으로 내려왔습니다. 이곳에서 바람의 신, 비의 신, 구름의 신을 데리고 농사, 생명, 병, 벌 등 인간 세상의 360여 가지 일을 돌보았습니다. 환웅은 사람들이 올바르게 살 수 있도록 세상을 가르치고 다스렸습니다.
+        </div>
+        <div class="audio-btn-wrapper mx-auto" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1773682429/2-all_al3wmr.wav', this)">
+            <i class="ph ph-play text-3xl"></i>
+        </div>
+    </div>
+
+    <!-- Quiz Pages 7~9 -->
+    <div class="page" id="page-7">
+        <h3 class="text-lg md:text-2xl font-bold mb-4 md:mb-8 text-primary">환웅은 몇 명의 신하와 함께 내려왔어요?</h3>
+        <div class="flex flex-col w-full max-w-md items-center gap-2 md:gap-3">
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-base md:text-lg">300명</button>
+            <button onclick="checkQuiz(this, true)" class="quiz-option text-base md:text-lg">3,000명</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-base md:text-lg">30,000명</button>
+        </div>
+    </div>
+
+    <!-- Multi Select Quiz -->
+    <div class="page" id="page-8">
+        <h3 class="text-lg md:text-2xl font-bold mb-2 md:mb-6 text-primary">환웅과 함께 일한 신을 모두 골라 보세요.</h3>
+        <p class="text-xs md:text-sm text-gray-500 mb-4 md:mb-6">Sélectionnez toutes les bonnes réponses.</p>
+        <div class="grid grid-cols-2 md:grid-cols-2 gap-2 md:gap-3 w-full max-w-lg">
+            <button onclick="checkMultiQuiz(this, true)" class="quiz-option text-sm md:text-base">바람의 신</button>
+            <button onclick="checkMultiQuiz(this, false)" class="quiz-option text-sm md:text-base">해의 신</button>
+            <button onclick="checkMultiQuiz(this, false)" class="quiz-option text-sm md:text-base">음식의 신</button>
+            <button onclick="checkMultiQuiz(this, false)" class="quiz-option text-sm md:text-base">인간의 신</button>
+            <button onclick="checkMultiQuiz(this, true)" class="quiz-option text-sm md:text-base">비의 신</button>
+            <button onclick="checkMultiQuiz(this, false)" class="quiz-option text-sm md:text-base">노래의 신</button>
+            <button onclick="checkMultiQuiz(this, true)" class="quiz-option text-sm md:text-base col-span-2">구름의 신</button>
+        </div>
+    </div>
+
+    <div class="page" id="page-9">
+        <p class="mb-2 md:mb-4 text-gray-500 text-xs md:text-sm">J'ai arrosé l'arbre pour qu'il pousse.</p>
+        <h3 class="text-lg md:text-2xl font-bold mb-4 md:mb-8 text-primary">나무가 ____ 물을 주었습니다.</h3>
+        <div class="flex flex-col w-full max-w-md items-center gap-2 md:gap-3">
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">자라기 위해</button>
+            <button onclick="checkQuiz(this, true, 'pop-9')" class="quiz-option text-sm md:text-lg">자라도록</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">자라니까</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">자라면서</button>
+        </div>
+    </div>
+
+    <!-- Outro (10) -->
+    <div class="page" id="page-10">
+        <div class="mb-6 text-accent"><i class="ph ph-sparkle text-6xl"></i></div>
+        <div class="bg-white p-8 rounded-2xl mb-10 max-w-lg shadow-sm">
+            <h3 class="text-xl font-bold mb-4 text-primary">오늘 이야기가 재미있었나요?</h3>
+            <p class="text-gray-700 leading-relaxed">환웅이 다스리는 세상은 아주 평화로웠습니다. 그런데 어느 날, 아주 놀라운 일이 일어납니다. 무슨 일이 일어날까요? 제3장에서 확인해 보세요!</p>
+            <hr class="my-4 border-gray-200">
+            <p class="text-gray-500 italic text-sm md:text-base leading-relaxed">Avez-vous aimé l'histoire d'aujourd'hui ? Le monde dirigé par Hwanung était très paisible. Mais un jour, un événement surprenant arrive. Que va-t-il se passer ? Découvrez-le au chapitre 3 !</p>
+        </div>
+    </div>
+
+    <!-- Popups -->
+    <div id="vocab-popup-1" class="popup">
+        <h4 class="font-bold text-lg mb-2 text-primary">어휘 ✏️ ..여 가지</h4>
+        <p class="text-sm text-gray-700 leading-relaxed mb-4 text-left">« -여 » est un suffixe qui indique que le nombre dépasse approximativement la quantité donnée. « 가지 » est utilisé pour compter le nombre de sortes ou de types de choses.</p>
+        <button onclick="closePopup('vocab-popup-1')" class="btn-primary w-full justify-center">Fermer</button>
+    </div>
+
+    <div id="vocab-popup-2" class="popup">
+        <h4 class="font-bold text-lg mb-2 text-primary">어휘 ✏️ 돌보다</h4>
+        <p class="text-sm text-gray-700 leading-relaxed mb-4 text-left">Signifie prendre soin de quelqu'un ou s'occuper d'une tâche/responsabilité.</p>
+        <button onclick="closePopup('vocab-popup-2')" class="btn-primary w-full justify-center">Fermer</button>
+    </div>
+
+    <div id="pop-9" class="popup">
+        <h4 class="font-bold text-lg mb-2 text-primary">문법 💡 V + -도록</h4>
+        <p class="text-sm">Indique un but ou un résultat souhaité, se traduisant par « afin de » ou « pour que ».</p>
+        <button onclick="closePopup('pop-9')" class="mt-6 btn-primary w-full justify-center">Fermer</button>
+    </div>
+
+    <!-- Nav -->
+    <div id="navBar" class="mt-auto p-4 flex justify-between items-center bg-white border-t border-gray-200 z-20" style="display:none;">
+        <button id="prevBtn" onclick="prevPage()" class="flex flex-col items-center text-primary disabled:opacity-20 px-4">
+            <i class="ph ph-caret-left text-2xl"></i>
+            <span class="nav-text">Précédent</span>
+        </button>
+        <span id="pageCounter" class="text-sm font-bold text-gray-400">1 / 11</span>
+        <button id="nextBtn" onclick="nextPage()" class="flex flex-col items-center text-primary disabled:opacity-20 px-4">
+            <i class="ph ph-caret-right text-2xl"></i>
+            <span class="nav-text">Suivant</span>
+        </button>
+    </div>
+</div>
+
+<script>
+    let currentPage = 0;
+    const totalPages = 10;
+    let currentAudio = null;
+    let synth, successSynth, failSynth;
+
+    // 2강 단어 리스트
+    const korWords = ["신하", "정상", "신", "농사", "생명", "돌보다", "올바르게"];
+    const fraWords = ["sujet", "sommet", "dieu", "agriculture", "vie", "s’occuper", "correctement"];
+    const correctMatches = { "신하": "sujet", "정상": "sommet", "신": "dieu", "농사": "agriculture", "생명": "vie", "돌보다": "s’occuper", "올바르게": "correctement" };
+    
+    let selectedKor = null;
+    let selectedFra = null;
+    let matchesFound = 0;
+
+    let quizState = {};
+    let isPopupOpen = false;
+
+    // 다중 선택 퀴즈 상태 (8페이지)
+    let multiQuizState = { matched: 0, required: 3 };
+
+    // 페이지 번호 변경에 맞춘 2강 오디오 맵 업데이트
+    const audioMap = {
+        1: 'https://res.cloudinary.com/de76i94ia/video/upload/v1773682429/2-all_al3wmr.wav',
+        3: 'https://res.cloudinary.com/de76i94ia/video/upload/v1773682423/2-1_efvwmp.mp3',
+        4: 'https://res.cloudinary.com/de76i94ia/video/upload/v1773682424/2-2_fgutrk.mp3',
+        5: 'https://res.cloudinary.com/de76i94ia/video/upload/v1773682426/2-3_ktu7ud.mp3',
+        6: 'https://res.cloudinary.com/de76i94ia/video/upload/v1773682429/2-all_al3wmr.wav'
+    };
+
+    window.onload = function() {
+        synth = new Tone.Synth().toDestination();
+        successSynth = new Tone.PolySynth().toDestination();
+        failSynth = new Tone.Synth({ oscillator: { type: "square" } }).toDestination();
+        initMatching();
+        updatePage();
+    };
+
+    function playTransitionSound() {
+        if(synth) synth.triggerAttackRelease("C6", "32n", "+0", 0.1);
+    }
+
+    function toggleAudio(url, btn) {
+        const icon = btn.querySelector('i');
+        const isSmall = btn.classList.contains('sm');
+        const playClass = isSmall ? 'ph ph-play text-xl' : 'ph ph-play text-3xl';
+        const pauseClass = isSmall ? 'ph ph-pause text-xl' : 'ph ph-pause text-3xl';
+
+        if (currentAudio && !currentAudio.paused && currentAudio.src.includes(url)) {
+            currentAudio.pause();
+            icon.className = playClass;
+        } else {
+            if (currentAudio) {
+                currentAudio.pause();
+            }
+            
+            document.querySelectorAll('.audio-btn-wrapper i').forEach(i => {
+                i.className = i.parentElement.classList.contains('sm') ? 'ph ph-play text-xl' : 'ph ph-play text-3xl';
+            });
+
+            currentAudio = new Audio(url);
+            
+            // Handle the play() promise to prevent AbortError when rapid navigation occurs
+            const playPromise = currentAudio.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    icon.className = pauseClass;
+                }).catch(error => {
+                    console.log("Audio play interrupted:", error);
+                    icon.className = playClass;
+                });
+            } else {
+                icon.className = pauseClass;
+            }
+
+            currentAudio.onended = () => icon.className = playClass;
+        }
+    }
+
+    function autoPlayAudio() {
+        if (audioMap[currentPage]) {
+            setTimeout(() => {
+                const activePage = document.getElementById(`page-${currentPage}`);
+                if (activePage) {
+                    const btn = activePage.querySelector('.audio-btn-wrapper');
+                    if(btn) toggleAudio(audioMap[currentPage], btn);
+                }
+            }, 500);
+        }
+    }
+
+    function nextPage() {
+        if (currentPage < totalPages) {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+            currentPage++;
+            playTransitionSound();
+            updatePage();
+            autoPlayAudio();
+        }
+    }
+
+    function prevPage() {
+        if (currentPage > 0) {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+            currentPage--;
+            playTransitionSound();
+            updatePage();
+            autoPlayAudio();
+        }
+    }
+
+    function updatePage() {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(`page-${currentPage}`).classList.add('active');
+        document.getElementById('progress').style.width = `${(currentPage / totalPages) * 100}%`;
+        document.getElementById('pageCounter').innerText = `${currentPage + 1} / ${totalPages + 1}`;
+        
+        const navBar = document.getElementById('navBar');
+        navBar.style.display = (currentPage === 0 || currentPage === totalPages) ? 'none' : 'flex';
+        
+        if (isPopupOpen) {
+            document.getElementById('prevBtn').disabled = true;
+            document.getElementById('nextBtn').disabled = true;
+            return; 
+        }
+
+        document.getElementById('prevBtn').disabled = (currentPage === 0);
+        
+        if (currentPage === 2 && matchesFound < korWords.length) {
+            document.getElementById('nextBtn').disabled = true;
+        } else if (currentPage >= 7 && currentPage <= 9 && !quizState[currentPage]) {
+            document.getElementById('nextBtn').disabled = true;
+        } else {
+            document.getElementById('nextBtn').disabled = (currentPage === totalPages);
+        }
+
+        if (currentPage === totalPages && !window.lessonCompleted) {
+            window.lessonCompleted = true;
+            if (successSynth) {
+                const now = Tone.now();
+                successSynth.triggerAttackRelease("C5", "8n", now);
+                successSynth.triggerAttackRelease("E5", "8n", now + 0.15);
+                successSynth.triggerAttackRelease("G5", "8n", now + 0.3);
+                successSynth.triggerAttackRelease("C6", "2n", now + 0.45);
+            }
+            window.parent.postMessage({ type: 'lesson_complete' }, '*');
+        }
+    }
+
+    function checkQuiz(btn, isCorrect, popupId) {
+        if (quizState[currentPage]) return; 
+
+        if (isCorrect) {
+            btn.classList.add('correct');
+            if (successSynth) successSynth.triggerAttackRelease(["C5", "E5", "G5"], "8n");
+            
+            quizState[currentPage] = true; 
+            document.getElementById('nextBtn').disabled = false; 
+
+            if (popupId) {
+                setTimeout(() => openPopup(popupId), 500);
+            }
+        } else {
+            btn.classList.add('wrong');
+            if (failSynth) failSynth.triggerAttackRelease("C3", "8n", "+0", 0.5);
+            setTimeout(() => btn.classList.remove('wrong'), 800);
+        }
+    }
+
+    // 다중 선택 퀴즈 로직 (8페이지)
+    function checkMultiQuiz(btn, isCorrect) {
+        if (quizState[currentPage]) return;
+        if (btn.classList.contains('correct') || btn.classList.contains('wrong')) return;
+
+        if (isCorrect) {
+            btn.classList.add('correct');
+            multiQuizState.matched++;
+            if (successSynth) successSynth.triggerAttackRelease(["C5", "E5", "G5"], "8n");
+
+            if (multiQuizState.matched === multiQuizState.required) {
+                quizState[currentPage] = true;
+                document.getElementById('nextBtn').disabled = false;
+            }
+        } else {
+            btn.classList.add('wrong');
+            if (failSynth) failSynth.triggerAttackRelease("C3", "8n", "+0", 0.5);
+            setTimeout(() => btn.classList.remove('wrong'), 800);
+        }
+    }
+
+    function openPopup(id) {
+        isPopupOpen = true;
+        document.getElementById(id).style.display = 'block';
+        updatePage(); 
+    }
+
+    function closePopup(id) {
+        isPopupOpen = false;
+        document.getElementById(id).style.display = 'none';
+        updatePage(); 
+    }
+
+    function initMatching() {
+        const korList = document.getElementById('kor-list');
+        const fraList = document.getElementById('fra-list');
+        [...korWords].sort(() => Math.random() - 0.5).forEach(w => {
+            const d = document.createElement('div');
+            d.className = 'match-item'; d.innerText = w;
+            d.onclick = () => selectMatch(d, 'kor');
+            korList.appendChild(d);
+        });
+        [...fraWords].sort(() => Math.random() - 0.5).forEach(w => {
+            const d = document.createElement('div');
+            d.className = 'match-item'; d.innerText = w;
+            d.onclick = () => selectMatch(d, 'fra');
+            fraList.appendChild(d);
+        });
+    }
+
+    function selectMatch(el, type) {
+        if (el.classList.contains('matched')) return;
+        if (type === 'kor') {
+            document.querySelectorAll('#kor-list .match-item').forEach(i => i.classList.remove('selected'));
+            selectedKor = el;
+        } else {
+            document.querySelectorAll('#fra-list .match-item').forEach(i => i.classList.remove('selected'));
+            selectedFra = el;
+        }
+        el.classList.add('selected');
+
+        if (selectedKor && selectedFra) {
+            if (correctMatches[selectedKor.innerText] === selectedFra.innerText) {
+                selectedKor.className = 'match-item matched';
+                selectedFra.className = 'match-item matched';
+                matchesFound++;
+                
+                if (successSynth) successSynth.triggerAttackRelease(["C5", "E5", "G5"], "8n");
+                
+                if (matchesFound === korWords.length) {
+                    document.getElementById('nextBtn').disabled = false;
+                }
+            } else {
+                const k = selectedKor, f = selectedFra;
+                if (failSynth) failSynth.triggerAttackRelease("C3", "8n", "+0", 0.5);
+                setTimeout(() => {
+                    k.classList.remove('selected');
+                    f.classList.remove('selected');
+                }, 400);
+            }
+            selectedKor = null; selectedFra = null;
+        }
+    }
+</script>
+
+</body>
+</html>
