@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>단군신화 제4장: 환웅의 약속과 인내</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4a3728;
+            --secondary: #d4a373;
+            --accent: #bc6c25;
+            --bg-light: #fefae0;
+            --highlight: #e63946;
+        }
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #1a1a1a;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            width: 100vw;
+        }
+        #app-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 100vh * (16/9); 
+            aspect-ratio: 16/9;
+            background-color: var(--bg-light);
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        @media (max-aspect-ratio: 1/1) {
+            #app-container {
+                aspect-ratio: 9/16;
+                max-width: 100vw;
+                max-height: calc(100vw * (16/9));
+            }
+        }
+
+        .page {
+            display: none;
+            flex: 1;
+            padding: clamp(1rem, 3vh, 2rem);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            animation: fadeIn 0.4s ease-out;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+        }
+        .page.active { display: flex; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        .quiz-option {
+            width: 100%;
+            padding: clamp(0.5rem, 2vh, 1rem);
+            background: white;
+            border: 2px solid var(--secondary);
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+        }
+        .quiz-option.correct { background: #4ade80; border-color: #22c55e; color: white; }
+        .quiz-option.wrong { background: #f87171; border-color: #ef4444; color: white; }
+
+        .matching-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(0.4rem, 1.5vh, 0.75rem);
+            width: 100%;
+            max-width: 600px;
+        }
+        .match-item {
+            padding: clamp(0.5rem, 1.5vh, 0.75rem);
+            background: white;
+            border: 2px solid var(--secondary);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            user-select: none;
+            font-size: 0.95rem;
+        }
+        .match-item.selected { background: var(--secondary); color: white; }
+        .match-item.matched { background: #e2e8f0; color: #94a3b8; border-color: #cbd5e1; cursor: default; }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(0,0,0,0.05);
+            width: 100%;
+            position: absolute; top: 0; left: 0; z-index: 10;
+        }
+        .progress-inner { height: 100%; background: var(--accent); transition: width 0.3s ease; }
+
+        .popup {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: white; padding: 2rem; border-radius: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            z-index: 100; display: none; width: 85%; max-width: 400px;
+            border: 2px solid var(--secondary);
+        }
+
+        .highlight-text { color: var(--highlight); font-weight: 700; }
+
+        /* 오디오 버튼 이미지 스타일 */
+        .audio-btn-wrapper {
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 64px; height: 64px;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--primary);
+            border-radius: 50%;
+            color: white;
+            flex-shrink: 0;
+        }
+        .audio-btn-wrapper.sm { width: 48px; height: 48px; }
+        .audio-btn-wrapper:hover { transform: scale(1.1); }
+
+        .nav-text { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+        
+        .info-card {
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            border: 1px solid rgba(212, 163, 115, 0.3);
+            text-align: left;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    <div class="progress-bar"><div id="progress" class="progress-inner" style="width: 0%"></div></div>
+
+    <!-- Cover Page (0) -->
+    <div class="page active" id="page-0">
+        <div class="mb-2 text-accent font-bold tracking-widest text-sm">Le mythe de Dangun</div>
+        <h1 class="text-4xl md:text-6xl font-bold text-primary mb-4">제4장: 환웅의 약속과 인내</h1>
+        <p class="text-xl text-gray-600 mb-10">La promesse de Hwanung et la patience</p>
+        <button onclick="nextPage()" class="btn-primary px-10 py-4">
+            Commencer <i class="ph ph-play-circle text-2xl"></i>
+        </button>
+    </div>
+
+    <!-- Page 1: Listen to Story (1) -->
+    <div class="page" id="page-1">
+        <h2 class="text-2xl font-bold mb-6 text-primary">이야기를 읽어 보세요.</h2>
+        <img src="https://res.cloudinary.com/de76i94ia/image/upload/v1773830601/illust_4_au3ofp.png" alt="Illustration" class="w-full max-w-sm md:max-w-md h-auto rounded-xl shadow-lg mb-6">
+        <div class="audio-btn-wrapper" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1773830606/4-all_e5uirh.wav', this)">
+            <i class="ph ph-play text-3xl"></i>
+        </div>
+    </div>
+
+    <!-- Page 2: Vocabulary Match (2) -->
+    <div class="page" id="page-2">
+        <h2 class="text-xl md:text-2xl font-bold mb-6 text-primary">Associez les mots coréens à leur traduction française.</h2>
+        <div class="matching-container">
+            <div id="kor-list" class="flex flex-col gap-1.5"></div>
+            <div id="fra-list" class="flex flex-col gap-1.5"></div>
+        </div>
+    </div>
+
+    <!-- Page 3: Story 1 + Grammar 1 Merged (3) -->
+    <div class="page" id="page-3">
+        <div class="text-xl md:text-2xl mb-4 text-primary leading-loose font-medium">
+            환웅은 "이 쑥과 마늘을 먹으며 100일 동안 햇빛을 보<span class="highlight-text">지 마라</span>"라고 말했습니다.
+        </div>
+        <div class="audio-btn-wrapper sm mb-4 mx-auto" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1773830687/4-1_xr7jzk.mp3', this)">
+            <i class="ph ph-play text-xl"></i>
+        </div>
+        <p class="mb-6 text-sm md:text-base text-gray-500 italic">Hwanung a dit : « En mangeant ces armoises et ces têtes d’ail, ne regardez pas la lumière du soleil pendant 100 jours. »</p>
+        
+        <div class="info-card max-w-xl mx-auto py-3">
+            <h3 class="text-base font-bold mb-1 text-primary">문법 💡 V + -지 마라</h3>
+            <p class="text-xs md:text-sm text-gray-700 leading-relaxed mb-2">Forme impérative négative au discours informel (Ne fais pas...).</p>
+            <ul class="text-xs md:text-sm text-gray-600 list-disc list-inside space-y-1 text-left">
+                <li><span class="font-medium text-gray-800">너무 많이 먹지 마라.</span> - Ne mange pas trop.</li>
+                <li><span class="font-medium text-gray-800">밤에 늦게 자지 마라.</span> - Ne te couche pas tard la nuit.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Page 4: Story 2 (4) -->
+    <div class="page" id="page-4">
+        <div class="text-xl md:text-2xl mb-8 text-primary leading-loose font-medium">
+            "그러면 너희는 진짜 사람의 모습이 될 수 있다"라고 약속했습니다.
+        </div>
+        <div class="audio-btn-wrapper mb-8 mx-auto" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1773830690/4-2_f0ccfc.mp3', this)">
+            <i class="ph ph-play text-3xl"></i>
+        </div>
+        <p class="mt-4 text-sm md:text-base text-gray-500 italic">Il a promis : « Alors, vous pourrez prendre l'apparence de vrais humains. »</p>
+    </div>
+
+    <!-- Page 5: Story 3 + Grammar (5) -->
+    <div class="page" id="page-5">
+        <div class="text-xl md:text-2xl mb-4 text-primary leading-loose font-medium">
+            곰과 호랑이는 동굴 안에서 쑥과 마늘만 먹으며 견디<span class="highlight-text">기 시작했습니다</span>.
+        </div>
+        <div class="audio-btn-wrapper sm mb-4 mx-auto" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1773830693/4-3_bnwszu.mp3', this)">
+            <i class="ph ph-play text-xl"></i>
+        </div>
+        <p class="mb-6 text-sm md:text-base text-gray-500 italic">L'ours et le tigre ont commencé à tenir bon dans la grotte en ne mangeant que de l'armoise et de l'ail.</p>
+        
+        <div class="info-card max-w-xl mx-auto">
+            <h3 class="text-lg font-bold mb-2 text-primary">문법 💡 V + -기 시작하다</h3>
+            <p class="text-sm md:text-base text-gray-700 leading-relaxed mb-3">Exprime le début d'une action (commencer à faire quelque chose).</p>
+            <ul class="text-sm md:text-base text-gray-600 list-disc list-inside space-y-1 text-left">
+                <li><span class="font-medium text-gray-800">비가 오기 시작했어요.</span> - Il a commencé à pleuvoir.</li>
+                <li><span class="font-medium text-gray-800">어제부터 한국어를 배우기 시작했어요.</span> - J'ai commencé à apprendre le coréen depuis hier.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Page 6: Story 4 + Vocab Popup Link (6) -->
+    <div class="page" id="page-6">
+        <div class="text-xl md:text-2xl mb-4 text-primary leading-loose font-medium">
+            하지만 어두운 동굴에서 100일을 버티는 것은 쉬운 <span class="text-blue-600 font-bold cursor-pointer border-b-2 border-dashed border-blue-600 hover:opacity-70 transition-opacity" onclick="openPopup('vocab-popup-1')">일</span>이 아니었습니다.
+        </div>
+        <div class="audio-btn-wrapper sm mb-4 mx-auto" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1773830696/4-4_g8zkxm.mp3', this)">
+            <i class="ph ph-play text-xl"></i>
+        </div>
+        <p class="mb-6 text-sm md:text-base text-gray-500 italic">Cependant, tenir bon pendant 100 jours dans une grotte sombre n'était pas une chose facile.</p>
+    </div>
+
+    <!-- Quiz Pages 7~11 -->
+    <div class="page" id="page-7">
+        <h3 class="text-lg md:text-2xl font-bold mb-4 md:mb-8 text-primary">환웅은 곰과 호랑이에게 무엇을 보지 말라고 했나요?</h3>
+        <div class="flex flex-col w-full max-w-md items-center gap-2 md:gap-3">
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">달</button>
+            <button onclick="checkQuiz(this, true)" class="quiz-option text-sm md:text-lg">햇빛</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">별</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">불</button>
+        </div>
+    </div>
+
+    <div class="page" id="page-8">
+        <h3 class="text-lg md:text-2xl font-bold mb-4 md:mb-8 text-primary">곰과 호랑이는 사람이 되기 위해 며칠을 기다려야 하나요?</h3>
+        <div class="flex flex-col w-full max-w-md items-center gap-2 md:gap-3">
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">10일</button>
+            <button onclick="checkQuiz(this, true)" class="quiz-option text-sm md:text-lg">100일</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">1년</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">3년</button>
+        </div>
+    </div>
+
+    <div class="page" id="page-9">
+        <p class="mb-2 md:mb-4 text-gray-500 text-xs md:text-sm">L'ours a commencé à manger d’armoise.</p>
+        <h3 class="text-lg md:text-2xl font-bold mb-4 md:mb-8 text-primary">곰은 쑥을 __ 시작했습니다.</h3>
+        <div class="flex flex-col w-full max-w-md items-center gap-2 md:gap-3">
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">먹고</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">먹어</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">먹으면</button>
+            <button onclick="checkQuiz(this, true, 'pop-9')" class="quiz-option text-sm md:text-lg">먹기</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">먹자</button>
+        </div>
+    </div>
+
+    <div class="page" id="page-10">
+        <p class="mb-2 md:mb-4 text-gray-500 text-xs md:text-sm">Ne regardez pas la lumière du soleil.</p>
+        <h3 class="text-lg md:text-2xl font-bold mb-4 md:mb-8 text-primary">햇빛을 보지 _____.</h3>
+        <div class="flex flex-col w-full max-w-md items-center gap-2 md:gap-3">
+            <button onclick="checkQuiz(this, true, 'pop-10')" class="quiz-option text-sm md:text-lg">마라</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">않다</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">안된다</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">아니다</button>
+        </div>
+    </div>
+
+    <div class="page" id="page-11">
+        <p class="mb-2 md:mb-4 text-gray-500 text-xs md:text-sm">Ce n'est pas facile d’étudier le coréen tous les jours.</p>
+        <h3 class="text-lg md:text-2xl font-bold mb-4 md:mb-8 text-primary">한국어를 매일 공부하는 건 __ __ ____.</h3>
+        <div class="flex flex-col w-full max-w-md items-center gap-2 md:gap-3">
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-base">쉬운 직업이 아니에요</button>
+            <button onclick="checkQuiz(this, true, 'pop-11')" class="quiz-option text-sm md:text-base">쉬운 일이 아니에요</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-base">쉽기가 아니에요</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-base">쉬움이 없어요</button>
+        </div>
+    </div>
+
+    <!-- Outro (12) -->
+    <div class="page" id="page-12">
+        <div class="mb-6 text-accent"><i class="ph ph-sparkle text-6xl"></i></div>
+        <div class="bg-white p-8 rounded-2xl mb-10 max-w-lg shadow-sm">
+            <h3 class="text-xl font-bold mb-4 text-primary">오늘 이야기는 여기까지예요!</h3>
+            <p class="text-gray-700 leading-relaxed">어둡고 답답한 동굴 속에서 곰과 호랑이는 100일을 무사히 버틸 수 있을까요? 제5장에서 그 결과를 확인해 보세요!</p>
+            <hr class="my-4 border-gray-200">
+            <p class="text-gray-500 italic text-sm md:text-base leading-relaxed">
+                C'est la fin de l'histoire d'aujourd'hui !<br>
+                L'ours et le tigre réussiront-ils à tenir 100 jours dans cette grotte sombre et étouffante ? Découvrez le résultat au chapitre 5 !
+            </p>
+        </div>
+    </div>
+
+    <!-- Popups -->
+    <div id="vocab-popup-1" class="popup">
+        <h4 class="font-bold text-lg mb-2 text-primary">어휘 ✏️ 일</h4>
+        <p class="text-sm text-gray-700 leading-relaxed mb-4 text-left">Dans ce contexte, le mot « 일 » ne signifie pas « travail » (métier), mais plutôt une « chose », une « action » ou un « fait ».</p>
+        <button onclick="closePopup('vocab-popup-1')" class="btn-primary w-full justify-center">Fermer</button>
+    </div>
+
+    <div id="pop-9" class="popup">
+        <h4 class="font-bold text-lg mb-2 text-primary">문법 💡 V + -기 시작하다</h4>
+        <p class="text-sm text-gray-700 leading-relaxed mb-4 text-left">Exprime le début d'une action (commencer à faire quelque chose).</p>
+        <button onclick="closePopup('pop-9')" class="btn-primary w-full justify-center">Fermer</button>
+    </div>
+
+    <div id="pop-10" class="popup">
+        <h4 class="font-bold text-lg mb-2 text-primary">문법 💡 V + -지 마라</h4>
+        <p class="text-sm text-gray-700 leading-relaxed mb-4 text-left">Forme impérative négative au discours informel (Ne fais pas...).</p>
+        <button onclick="closePopup('pop-10')" class="btn-primary w-full justify-center">Fermer</button>
+    </div>
+
+    <div id="pop-11" class="popup">
+        <h4 class="font-bold text-lg mb-2 text-primary">어휘 ✏️ 일</h4>
+        <p class="text-sm text-gray-700 leading-relaxed mb-4 text-left">Dans ce contexte, le mot « 일 » ne signifie pas « travail » (métier), mais plutôt une « chose », une « action » ou un « fait ».</p>
+        <button onclick="closePopup('pop-11')" class="btn-primary w-full justify-center">Fermer</button>
+    </div>
+
+    <!-- Nav -->
+    <div id="navBar" class="mt-auto p-4 flex justify-between items-center bg-white border-t border-gray-200 z-20" style="display:none;">
+        <button id="prevBtn" onclick="prevPage()" class="flex flex-col items-center text-primary disabled:opacity-20 px-4">
+            <i class="ph ph-caret-left text-2xl"></i>
+            <span class="nav-text">Précédent</span>
+        </button>
+        <span id="pageCounter" class="text-sm font-bold text-gray-400">1 / 13</span>
+        <button id="nextBtn" onclick="nextPage()" class="flex flex-col items-center text-primary disabled:opacity-20 px-4">
+            <i class="ph ph-caret-right text-2xl"></i>
+            <span class="nav-text">Suivant</span>
+        </button>
+    </div>
+</div>
+
+<script>
+    let currentPage = 0;
+    const totalPages = 12; // 0 to 12 = 13 pages total
+    let currentAudio = null;
+    let synth, successSynth, failSynth;
+
+    // 4강 단어 리스트
+    const korWords = ["햇빛", "모습", "약속하다", "견디다", "어둡다", "버티다"];
+    const fraWords = ["lumière du soleil", "apparence", "promettre", "endurer", "sombre", "résister"];
+    const correctMatches = { "햇빛": "lumière du soleil", "모습": "apparence", "약속하다": "promettre", "견디다": "endurer", "어둡다": "sombre", "버티다": "résister" };
+    
+    let selectedKor = null;
+    let selectedFra = null;
+    let matchesFound = 0;
+
+    let quizState = {};
+    let isPopupOpen = false;
+
+    // 페이지 번호 변경에 맞춘 4강 오디오 맵 업데이트
+    const audioMap = {
+        1: 'https://res.cloudinary.com/de76i94ia/video/upload/v1773830606/4-all_e5uirh.wav',
+        3: 'https://res.cloudinary.com/de76i94ia/video/upload/v1773830687/4-1_xr7jzk.mp3',
+        4: 'https://res.cloudinary.com/de76i94ia/video/upload/v1773830690/4-2_f0ccfc.mp3',
+        5: 'https://res.cloudinary.com/de76i94ia/video/upload/v1773830693/4-3_bnwszu.mp3',
+        6: 'https://res.cloudinary.com/de76i94ia/video/upload/v1773830696/4-4_g8zkxm.mp3'
+    };
+
+    window.onload = function() {
+        synth = new Tone.Synth().toDestination();
+        successSynth = new Tone.PolySynth().toDestination();
+        failSynth = new Tone.Synth({ oscillator: { type: "square" } }).toDestination();
+        initMatching();
+        updatePage();
+    };
+
+    function playTransitionSound() {
+        if(synth) synth.triggerAttackRelease("C6", "32n", "+0", 0.1);
+    }
+
+    function toggleAudio(url, btn) {
+        const icon = btn.querySelector('i');
+        const isSmall = btn.classList.contains('sm');
+        const playClass = isSmall ? 'ph ph-play text-xl' : 'ph ph-play text-3xl';
+        const pauseClass = isSmall ? 'ph ph-pause text-xl' : 'ph ph-pause text-3xl';
+
+        if (currentAudio && !currentAudio.paused && currentAudio.src.includes(url)) {
+            currentAudio.pause();
+            icon.className = playClass;
+        } else {
+            if (currentAudio) {
+                currentAudio.pause();
+            }
+            
+            document.querySelectorAll('.audio-btn-wrapper i').forEach(i => {
+                i.className = i.parentElement.classList.contains('sm') ? 'ph ph-play text-xl' : 'ph ph-play text-3xl';
+            });
+
+            currentAudio = new Audio(url);
+            
+            const playPromise = currentAudio.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    icon.className = pauseClass;
+                }).catch(error => {
+                    console.log("Audio play interrupted:", error);
+                    icon.className = playClass;
+                });
+            } else {
+                icon.className = pauseClass;
+            }
+
+            currentAudio.onended = () => icon.className = playClass;
+        }
+    }
+
+    function autoPlayAudio() {
+        if (audioMap[currentPage]) {
+            setTimeout(() => {
+                const activePage = document.getElementById(`page-${currentPage}`);
+                if (activePage) {
+                    const btn = activePage.querySelector('.audio-btn-wrapper');
+                    if(btn) toggleAudio(audioMap[currentPage], btn);
+                }
+            }, 500);
+        }
+    }
+
+    function nextPage() {
+        if (currentPage < totalPages) {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+            currentPage++;
+            playTransitionSound();
+            updatePage();
+            autoPlayAudio();
+        }
+    }
+
+    function prevPage() {
+        if (currentPage > 0) {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+            currentPage--;
+            playTransitionSound();
+            updatePage();
+            autoPlayAudio();
+        }
+    }
+
+    function updatePage() {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(`page-${currentPage}`).classList.add('active');
+        document.getElementById('progress').style.width = `${(currentPage / totalPages) * 100}%`;
+        document.getElementById('pageCounter').innerText = `${currentPage + 1} / ${totalPages + 1}`;
+        
+        const navBar = document.getElementById('navBar');
+        navBar.style.display = (currentPage === 0 || currentPage === totalPages) ? 'none' : 'flex';
+        
+        if (isPopupOpen) {
+            document.getElementById('prevBtn').disabled = true;
+            document.getElementById('nextBtn').disabled = true;
+            return; 
+        }
+
+        document.getElementById('prevBtn').disabled = (currentPage === 0);
+        
+        if (currentPage === 2 && matchesFound < korWords.length) {
+            document.getElementById('nextBtn').disabled = true;
+        } else if (currentPage >= 7 && currentPage <= 11 && !quizState[currentPage]) {
+            document.getElementById('nextBtn').disabled = true;
+        } else {
+            document.getElementById('nextBtn').disabled = (currentPage === totalPages);
+        }
+
+        if (currentPage === totalPages && !window.lessonCompleted) {
+            window.lessonCompleted = true;
+            if (successSynth) {
+                const now = Tone.now();
+                successSynth.triggerAttackRelease("C5", "8n", now);
+                successSynth.triggerAttackRelease("E5", "8n", now + 0.15);
+                successSynth.triggerAttackRelease("G5", "8n", now + 0.3);
+                successSynth.triggerAttackRelease("C6", "2n", now + 0.45);
+            }
+            window.parent.postMessage({ type: 'lesson_complete' }, '*');
+        }
+    }
+
+    function checkQuiz(btn, isCorrect, popupId) {
+        if (quizState[currentPage]) return; 
+
+        if (isCorrect) {
+            btn.classList.add('correct');
+            if (successSynth) successSynth.triggerAttackRelease(["C5", "E5", "G5"], "8n");
+            
+            quizState[currentPage] = true; 
+            document.getElementById('nextBtn').disabled = false; 
+
+            if (popupId) {
+                setTimeout(() => openPopup(popupId), 500);
+            }
+        } else {
+            btn.classList.add('wrong');
+            if (failSynth) failSynth.triggerAttackRelease("C3", "8n", "+0", 0.5);
+            setTimeout(() => btn.classList.remove('wrong'), 800);
+        }
+    }
+
+    function openPopup(id) {
+        isPopupOpen = true;
+        document.getElementById(id).style.display = 'block';
+        updatePage(); 
+    }
+
+    function closePopup(id) {
+        isPopupOpen = false;
+        document.getElementById(id).style.display = 'none';
+        updatePage(); 
+    }
+
+    function initMatching() {
+        const korList = document.getElementById('kor-list');
+        const fraList = document.getElementById('fra-list');
+        [...korWords].sort(() => Math.random() - 0.5).forEach(w => {
+            const d = document.createElement('div');
+            d.className = 'match-item'; d.innerText = w;
+            d.onclick = () => selectMatch(d, 'kor');
+            korList.appendChild(d);
+        });
+        [...fraWords].sort(() => Math.random() - 0.5).forEach(w => {
+            const d = document.createElement('div');
+            d.className = 'match-item'; d.innerText = w;
+            d.onclick = () => selectMatch(d, 'fra');
+            fraList.appendChild(d);
+        });
+    }
+
+    function selectMatch(el, type) {
+        if (el.classList.contains('matched')) return;
+        if (type === 'kor') {
+            document.querySelectorAll('#kor-list .match-item').forEach(i => i.classList.remove('selected'));
+            selectedKor = el;
+        } else {
+            document.querySelectorAll('#fra-list .match-item').forEach(i => i.classList.remove('selected'));
+            selectedFra = el;
+        }
+        el.classList.add('selected');
+
+        if (selectedKor && selectedFra) {
+            if (correctMatches[selectedKor.innerText] === selectedFra.innerText) {
+                selectedKor.className = 'match-item matched';
+                selectedFra.className = 'match-item matched';
+                matchesFound++;
+                
+                if (successSynth) successSynth.triggerAttackRelease(["C5", "E5", "G5"], "8n");
+                
+                if (matchesFound === korWords.length) {
+                    document.getElementById('nextBtn').disabled = false;
+                }
+            } else {
+                const k = selectedKor, f = selectedFra;
+                if (failSynth) failSynth.triggerAttackRelease("C3", "8n", "+0", 0.5);
+                setTimeout(() => {
+                    k.classList.remove('selected');
+                    f.classList.remove('selected');
+                }, 400);
+            }
+            selectedKor = null; selectedFra = null;
+        }
+    }
+</script>
+
+</body>
+</html>
