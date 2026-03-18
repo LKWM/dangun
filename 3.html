@@ -264,9 +264,20 @@
         </div>
     </div>
 
-    <!-- Quiz Pages 7~10 -->
-    <!-- Multi Select Quiz -->
+    <!-- Page 7: Review (7) -->
     <div class="page" id="page-7">
+        <h2 class="text-xl md:text-3xl font-bold mb-4 md:mb-6 text-primary">이야기를 다시 한 번 읽어 보세요.</h2>
+        <div class="bg-white p-6 md:p-10 rounded-xl shadow-inner text-left text-sm md:text-xl lg:text-2xl leading-loose mb-6 max-w-3xl border border-secondary/20">
+            태백산 동굴에는 곰 한 마리와 호랑이 한 마리가 같이 살고 있었습니다. 곰과 호랑이는 매일 환웅을 찾아가 "사람이 되고 싶어요"라고 간절히 빌었습니다. 환웅은 그들의 이야기를 듣고 한 가지 방법을 알려 주었습니다. 곰과 호랑이에게 쑥과 마늘 20개를 주었습니다.
+        </div>
+        <div class="audio-btn-wrapper mx-auto" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1773826591/3-all_xjgnjs.wav', this)">
+            <i class="ph ph-play text-3xl"></i>
+        </div>
+    </div>
+
+    <!-- Quiz Pages 8~11 -->
+    <!-- Multi Select Quiz -->
+    <div class="page" id="page-8">
         <h3 class="text-lg md:text-2xl font-bold mb-2 md:mb-6 text-primary">환웅은 곰과 호랑이에게 무엇을 주었나요?</h3>
         <p class="text-xs md:text-sm text-gray-500 mb-4 md:mb-6">Sélectionnez toutes les bonnes réponses.</p>
         <div class="grid grid-cols-2 md:grid-cols-2 gap-2 md:gap-3 w-full max-w-lg">
@@ -278,7 +289,7 @@
         </div>
     </div>
 
-    <div class="page" id="page-8">
+    <div class="page" id="page-9">
         <h3 class="text-lg md:text-2xl font-bold mb-4 md:mb-8 text-primary">곰과 호랑이의 소원은 무엇이었나요?</h3>
         <div class="flex flex-col w-full max-w-md items-center gap-2 md:gap-3">
             <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">Avoir beaucoup de nourriture</button>
@@ -287,7 +298,7 @@
         </div>
     </div>
 
-    <div class="page" id="page-9">
+    <div class="page" id="page-10">
         <p class="mb-2 md:mb-4 text-gray-500 text-xs md:text-sm">L'ours et le tigre priaient tous les jours.</p>
         <h3 class="text-lg md:text-2xl font-bold mb-4 md:mb-8 text-primary">곰과 호랑이는 매일 _____.</h3>
         <div class="flex flex-col w-full max-w-md items-center gap-2 md:gap-3">
@@ -298,11 +309,11 @@
         </div>
     </div>
 
-    <div class="page" id="page-10">
+    <div class="page" id="page-11">
         <p class="mb-2 md:mb-4 text-gray-500 text-xs md:text-sm">Hwanung leur a indiqué une méthode.</p>
         <h3 class="text-lg md:text-2xl font-bold mb-4 md:mb-8 text-primary">환웅은 방법을 __ 주었습니다.</h3>
         <div class="flex flex-col w-full max-w-md items-center gap-2 md:gap-3">
-            <button onclick="checkQuiz(this, true, 'pop-10')" class="quiz-option text-sm md:text-lg">알려</button>
+            <button onclick="checkQuiz(this, true, 'pop-11')" class="quiz-option text-sm md:text-lg">알려</button>
             <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">알리</button>
             <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">알리고</button>
             <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">알리며</button>
@@ -310,8 +321,8 @@
         </div>
     </div>
 
-    <!-- Outro (11) -->
-    <div class="page" id="page-11">
+    <!-- Outro (12) -->
+    <div class="page" id="page-12">
         <div class="mb-6 text-accent"><i class="ph ph-sparkle text-6xl"></i></div>
         <div class="bg-white p-8 rounded-2xl mb-10 max-w-lg shadow-sm">
             <h3 class="text-xl font-bold mb-4 text-primary">오늘 이야기는 여기까지예요!</h3>
@@ -331,10 +342,10 @@
         <button onclick="closePopup('vocab-popup-1')" class="btn-primary w-full justify-center">Fermer</button>
     </div>
 
-    <div id="pop-10" class="popup">
+    <div id="pop-11" class="popup">
         <h4 class="font-bold text-lg mb-2 text-primary">문법 💡 V + -아/어 주다</h4>
-        <p class="text-sm text-gray-700 leading-relaxed mb-4 text-left">utilisé lorsqu'une action est effectuée pour quelqu'un d'autre.</p>
-        <button onclick="closePopup('pop-10')" class="btn-primary w-full justify-center">Fermer</button>
+        <p class="text-sm text-gray-700 leading-relaxed mb-4 text-left">Utilisé lorsqu'une action est effectuée pour quelqu'un d'autre.</p>
+        <button onclick="closePopup('pop-11')" class="btn-primary w-full justify-center">Fermer</button>
     </div>
 
     <!-- Nav -->
@@ -343,7 +354,7 @@
             <i class="ph ph-caret-left text-2xl"></i>
             <span class="nav-text">Précédent</span>
         </button>
-        <span id="pageCounter" class="text-sm font-bold text-gray-400">1 / 12</span>
+        <span id="pageCounter" class="text-sm font-bold text-gray-400">1 / 13</span>
         <button id="nextBtn" onclick="nextPage()" class="flex flex-col items-center text-primary disabled:opacity-20 px-4">
             <i class="ph ph-caret-right text-2xl"></i>
             <span class="nav-text">Suivant</span>
@@ -353,11 +364,10 @@
 
 <script>
     let currentPage = 0;
-    const totalPages = 11;
+    const totalPages = 12; // 0 to 12 = 13 pages
     let currentAudio = null;
     let synth, successSynth, failSynth;
 
-    // 3강 단어 리스트
     const korWords = ["동굴", "간절히", "빌다", "쑥", "곰", "호랑이", "방법"];
     const fraWords = ["grotte", "ardemment", "prier", "armoise", "ours", "tigre", "méthode"];
     const correctMatches = { "동굴": "grotte", "간절히": "ardemment", "빌다": "prier", "쑥": "armoise", "곰": "ours", "호랑이": "tigre", "방법": "méthode" };
@@ -369,16 +379,15 @@
     let quizState = {};
     let isPopupOpen = false;
 
-    // 다중 선택 퀴즈 상태 (7페이지)
     let multiQuizState = { matched: 0, required: 2 };
 
-    // 페이지 번호 변경에 맞춘 3강 오디오 맵 업데이트
     const audioMap = {
         1: 'https://res.cloudinary.com/de76i94ia/video/upload/v1773826591/3-all_xjgnjs.wav',
         3: 'https://res.cloudinary.com/de76i94ia/video/upload/v1773826588/3-1_hrtstl.mp3',
         4: 'https://res.cloudinary.com/de76i94ia/video/upload/v1773826579/3-2_ywn5eq.mp3',
         5: 'https://res.cloudinary.com/de76i94ia/video/upload/v1773826582/3-3_vh7uvm.mp3',
-        6: 'https://res.cloudinary.com/de76i94ia/video/upload/v1773826585/3-4_mnkswx.mp3'
+        6: 'https://res.cloudinary.com/de76i94ia/video/upload/v1773826585/3-4_mnkswx.mp3',
+        7: 'https://res.cloudinary.com/de76i94ia/video/upload/v1773826591/3-all_xjgnjs.wav' // Review Audio
     };
 
     window.onload = function() {
@@ -486,7 +495,7 @@
         
         if (currentPage === 2 && matchesFound < korWords.length) {
             document.getElementById('nextBtn').disabled = true;
-        } else if (currentPage >= 7 && currentPage <= 10 && !quizState[currentPage]) {
+        } else if (currentPage >= 8 && currentPage <= 11 && !quizState[currentPage]) { // Shifted indices
             document.getElementById('nextBtn').disabled = true;
         } else {
             document.getElementById('nextBtn').disabled = (currentPage === totalPages);
@@ -525,7 +534,6 @@
         }
     }
 
-    // 다중 선택 퀴즈 로직 (7페이지)
     function checkMultiQuiz(btn, isCorrect) {
         if (quizState[currentPage]) return;
         if (btn.classList.contains('correct') || btn.classList.contains('wrong')) return;
