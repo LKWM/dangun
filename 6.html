@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>단군신화 제6장: 단군왕검의 탄생</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4a3728;
+            --secondary: #d4a373;
+            --accent: #bc6c25;
+            --bg-light: #fefae0;
+            --highlight: #e63946;
+        }
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #1a1a1a;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            width: 100vw;
+        }
+        #app-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 100vh * (16/9); 
+            aspect-ratio: 16/9;
+            background-color: var(--bg-light);
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        @media (max-aspect-ratio: 1/1) {
+            #app-container {
+                aspect-ratio: 9/16;
+                max-width: 100vw;
+                max-height: calc(100vw * (16/9));
+            }
+        }
+
+        .page {
+            display: none;
+            flex: 1;
+            padding: clamp(1rem, 3vh, 2rem);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            animation: fadeIn 0.4s ease-out;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+        }
+        .page.active { display: flex; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        .quiz-option {
+            width: 100%;
+            padding: clamp(0.5rem, 2vh, 1rem);
+            background: white;
+            border: 2px solid var(--secondary);
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+        }
+        .quiz-option.correct { background: #4ade80; border-color: #22c55e; color: white; }
+        .quiz-option.wrong { background: #f87171; border-color: #ef4444; color: white; }
+
+        .matching-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(0.4rem, 1.5vh, 0.75rem);
+            width: 100%;
+            max-width: 600px;
+        }
+        .match-item {
+            padding: clamp(0.5rem, 1.5vh, 0.75rem);
+            background: white;
+            border: 2px solid var(--secondary);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            user-select: none;
+            font-size: 0.95rem;
+        }
+        .match-item.selected { background: var(--secondary); color: white; }
+        .match-item.matched { background: #e2e8f0; color: #94a3b8; border-color: #cbd5e1; cursor: default; }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(0,0,0,0.05);
+            width: 100%;
+            position: absolute; top: 0; left: 0; z-index: 10;
+        }
+        .progress-inner { height: 100%; background: var(--accent); transition: width 0.3s ease; }
+
+        .popup {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: white; padding: 2rem; border-radius: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            z-index: 100; display: none; width: 85%; max-width: 400px;
+            border: 2px solid var(--secondary);
+        }
+
+        .highlight-text { color: var(--highlight); font-weight: 700; }
+
+        /* 오디오 버튼 이미지 스타일 */
+        .audio-btn-wrapper {
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 64px; height: 64px;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--primary);
+            border-radius: 50%;
+            color: white;
+            flex-shrink: 0;
+        }
+        .audio-btn-wrapper.sm { width: 48px; height: 48px; }
+        .audio-btn-wrapper:hover { transform: scale(1.1); }
+
+        .nav-text { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+        
+        .info-card {
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            border: 1px solid rgba(212, 163, 115, 0.3);
+            text-align: left;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    <div class="progress-bar"><div id="progress" class="progress-inner" style="width: 0%"></div></div>
+
+    <!-- Cover Page (0) -->
+    <div class="page active" id="page-0">
+        <div class="mb-2 text-accent font-bold tracking-widest text-sm">Le mythe de Dangun</div>
+        <h1 class="text-4xl md:text-6xl font-bold text-primary mb-4">제6장: 단군왕검의 탄생</h1>
+        <p class="text-xl text-gray-600 mb-10">La naissance de Dangun Wanggeom</p>
+        <button onclick="nextPage()" class="btn-primary px-10 py-4">
+            Commencer <i class="ph ph-play-circle text-2xl"></i>
+        </button>
+    </div>
+
+    <!-- Page 1: Listen to Story (1) -->
+    <div class="page" id="page-1">
+        <h2 class="text-2xl font-bold mb-6 text-primary">이야기를 읽어 보세요.</h2>
+        <img src="https://res.cloudinary.com/de76i94ia/image/upload/v1773942601/illust_6_ufsg1k.png" alt="Illustration" class="w-full max-w-sm md:max-w-md h-auto rounded-xl shadow-lg mb-6">
+        <div class="audio-btn-wrapper" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1773942187/6-all_voz7iz.wav', this)">
+            <i class="ph ph-play text-3xl"></i>
+        </div>
+    </div>
+
+    <!-- Page 2: Vocabulary Match (2) -->
+    <div class="page" id="page-2">
+        <h2 class="text-xl md:text-2xl font-bold mb-6 text-primary">Associez les mots coréens à leur traduction française.</h2>
+        <div class="matching-container">
+            <div id="kor-list" class="flex flex-col gap-1.5"></div>
+            <div id="fra-list" class="flex flex-col gap-1.5"></div>
+        </div>
+    </div>
+
+    <!-- Page 3: Story 1 + Grammar 1 Merged (3) -->
+    <div class="page" id="page-3">
+        <div class="text-xl md:text-2xl mb-4 text-primary leading-loose font-medium">
+            웅녀는 신단수라는 나무 아래에서 아기를 갖게 <span class="highlight-text">해 달라고</span> 매일 기도했습니다.
+        </div>
+        <div class="audio-btn-wrapper sm mb-4 mx-auto" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1773942292/6-1_drsg7a.mp3', this)">
+            <i class="ph ph-play text-xl"></i>
+        </div>
+        <p class="mb-6 text-sm md:text-base text-gray-500 italic">Ungnyeo priait tous les jours sous un arbre appelé Sindansu pour qu'on lui donne un bébé.</p>
+        
+        <div class="info-card max-w-xl mx-auto py-3">
+            <h3 class="text-base font-bold mb-1 text-primary">문법 💡 V + -아/어 달라고</h3>
+            <p class="text-xs md:text-sm text-gray-700 leading-relaxed mb-2">Forme du discours indirect utilisée pour rapporter une demande (demander de faire quelque chose pour soi).</p>
+            <ul class="text-xs md:text-sm text-gray-600 list-disc list-inside space-y-1 text-left">
+                <li><span class="font-medium text-gray-800">친구에게 도와 달라고 했어요.</span> - J'ai demandé à un ami de m'aider.</li>
+                <li><span class="font-medium text-gray-800">물을 달라고 부탁했습니다.</span> - Je lui ai demandé de donner de l'eau.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Page 4: Story 2 (4) -->
+    <div class="page" id="page-4">
+        <div class="text-xl md:text-2xl mb-8 text-primary leading-loose font-medium">
+            하지만 웅녀와 결혼할 사람이 세상에 없었습니다.
+        </div>
+        <div class="audio-btn-wrapper mb-8 mx-auto" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1773942285/6-2_r2hbhp.mp3', this)">
+            <i class="ph ph-play text-3xl"></i>
+        </div>
+        <p class="mt-4 text-sm md:text-base text-gray-500 italic">Cependant, il n'y avait personne au monde pour épouser Ungnyeo.</p>
+    </div>
+
+    <!-- Page 5: Story 3 + Grammar (5) -->
+    <div class="page" id="page-5">
+        <div class="text-xl md:text-2xl mb-4 text-primary leading-loose font-medium">
+            이 사정을 안 환웅이 잠시 사람으로 <span class="highlight-text">변해</span> 웅녀와 결혼했습니다.
+        </div>
+        <div class="audio-btn-wrapper sm mb-4 mx-auto" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1773942288/6-3_geaull.mp3', this)">
+            <i class="ph ph-play text-xl"></i>
+        </div>
+        <p class="mb-6 text-sm md:text-base text-gray-500 italic">Hwanung, en apprenant cette situation, s'est temporairement transformé en humain et a épousé Ungnyeo.</p>
+        
+        <div class="info-card max-w-xl mx-auto">
+            <h3 class="text-lg font-bold mb-2 text-primary">문법 💡 V + -아/어(서)</h3>
+            <p class="text-sm md:text-base text-gray-700 leading-relaxed mb-3">Quand '-아/어서' indique la cause ou l'ordre séquentiel d'une action, on omet souvent le « 서 » Dans le langage écrit formel.</p>
+            <ul class="text-sm md:text-base text-gray-600 list-disc list-inside space-y-1 text-left">
+                <li><span class="font-medium text-gray-800">환웅이 사람으로 변해(서) 웅녀와 결혼했습니다.</span> - Hwanwung s’est transformé en humain et a épousé Ungnyeo.</li>
+                <li><span class="font-medium text-gray-800">아침에 일찍 일어나(서) 운동을 했습니다.</span> - Je me suis levé tôt le matin et j'ai fait de l'exercice.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Page 6: Story 4 + Vocab Popup Link (6) -->
+    <div class="page" id="page-6">
+        <div class="text-xl md:text-2xl mb-4 text-primary leading-loose font-medium">
+            두 사람 사이에서 아들이 태어났고, 이 아들의 이름을 '단군왕검'이라고 <span class="text-blue-600 font-bold cursor-pointer border-b-2 border-dashed border-blue-600 hover:opacity-70 transition-opacity" onclick="openPopup('vocab-popup-1')">지었습니다</span>.
+        </div>
+        <div class="audio-btn-wrapper sm mb-4 mx-auto" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1773942297/6-4_m1ojiq.mp3', this)">
+            <i class="ph ph-play text-xl"></i>
+        </div>
+        <p class="mb-6 text-sm md:text-base text-gray-500 italic">Un fils est né de leur union, et ils ont nommé cet enfant « Dangun Wanggeom ».</p>
+    </div>
+
+    <!-- Page 7: Review (7) -->
+    <div class="page" id="page-7">
+        <h2 class="text-xl md:text-3xl font-bold mb-4 md:mb-6 text-primary">이야기를 다시 한 번 읽어 보세요.</h2>
+        <div class="bg-white p-6 md:p-10 rounded-xl shadow-inner text-left text-sm md:text-xl lg:text-2xl leading-loose mb-6 max-w-3xl border border-secondary/20">
+            웅녀는 신단수라는 나무 아래에서 아기를 갖게 해 달라고 매일 기도했습니다. 하지만 웅녀와 결혼할 사람이 세상에 없었습니다. 이 사정을 안 환웅이 잠시 사람으로 변해 웅녀와 결혼했습니다. 두 사람 사이에서 아들이 태어났고, 이 아들의 이름을 '단군왕검'이라고 지었습니다.
+        </div>
+        <div class="audio-btn-wrapper mx-auto" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1773942187/6-all_voz7iz.wav', this)">
+            <i class="ph ph-play text-3xl"></i>
+        </div>
+    </div>
+
+    <!-- Quiz Pages 8~12 -->
+    <div class="page" id="page-8">
+        <h3 class="text-lg md:text-2xl font-bold mb-4 md:mb-8 text-primary">웅녀는 왜 나무 아래에서 기도했나요?</h3>
+        <div class="flex flex-col w-full max-w-lg items-center gap-2 md:gap-3">
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-base">Parce qu’elle avait besoin de l’argent</button>
+            <button onclick="checkQuiz(this, true)" class="quiz-option text-sm md:text-base">Parce qu’elle voulait un enfant</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-base">Parce qu’elle voulait devenir humaine</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-base">Parce qu’elle voulait aider le tigre</button>
+        </div>
+    </div>
+
+    <div class="page" id="page-9">
+        <h3 class="text-lg md:text-2xl font-bold mb-4 md:mb-8 text-primary">웅녀와 결혼한 사람은 누구인가요?</h3>
+        <div class="flex flex-col w-full max-w-md items-center gap-2 md:gap-3">
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">환인</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">호랑이</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">신단수</button>
+            <button onclick="checkQuiz(this, true)" class="quiz-option text-sm md:text-lg">환웅</button>
+        </div>
+    </div>
+
+    <div class="page" id="page-10">
+        <p class="mb-2 md:mb-4 text-gray-500 text-xs md:text-sm">J'ai demandé à mon ami de m'aider.</p>
+        <h3 class="text-lg md:text-2xl font-bold mb-4 md:mb-8 text-primary">친구에게 도와___ 했습니다.</h3>
+        <div class="flex flex-col w-full max-w-md items-center gap-2 md:gap-3">
+            <button onclick="checkQuiz(this, true, 'pop-10')" class="quiz-option text-sm md:text-lg">달라고</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">달라며</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">달라는데</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">달라서</button>
+        </div>
+    </div>
+
+    <div class="page" id="page-11">
+        <p class="mb-2 md:mb-4 text-gray-500 text-xs md:text-sm">Il s'est transformé en humain et s'est marié.</p>
+        <h3 class="text-lg md:text-2xl font-bold mb-4 md:mb-8 text-primary">사람으로 변_ 결혼했습니다.</h3>
+        <div class="flex flex-col w-full max-w-md items-center gap-2 md:gap-3">
+            <button onclick="checkQuiz(this, true, 'pop-11')" class="quiz-option text-sm md:text-lg">해</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">하고</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">하니</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">하니까</button>
+        </div>
+    </div>
+
+    <div class="page" id="page-12">
+        <p class="mb-2 md:mb-4 text-gray-500 text-xs md:text-sm">Ils ont créé le nom de cet enfant.</p>
+        <h3 class="text-lg md:text-2xl font-bold mb-4 md:mb-8 text-primary">이 아들의 이름을 '단군왕검'이라고 _____.</h3>
+        <div class="flex flex-col w-full max-w-md items-center gap-2 md:gap-3">
+            <button onclick="checkQuiz(this, true, 'pop-12')" class="quiz-option text-sm md:text-lg">지었습니다</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">찾았습니다</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">골랐습니다</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">불렀습니다</button>
+        </div>
+    </div>
+
+    <!-- Outro (13) -->
+    <div class="page" id="page-13">
+        <div class="mb-6 text-accent"><i class="ph ph-sparkle text-6xl"></i></div>
+        <div class="bg-white p-8 rounded-2xl mb-10 max-w-lg shadow-sm">
+            <h3 class="text-xl font-bold mb-4 text-primary">수고하셨습니다!</h3>
+            <p class="text-gray-700 leading-relaxed">드디어 단군왕검이 태어났습니다! 하늘의 아들과 땅의 웅녀 사이에서 태어난 이 아이는 자라서 어떤 일을 하게 될까요? 한국 첫 번째 나라의 건국을 제7장에서 확인해 보세요!</p>
+            <hr class="my-4 border-gray-200">
+            <p class="text-gray-500 italic text-sm md:text-base leading-relaxed">
+                Enfin, Dangun Wanggeom est né ! Que fera cet enfant, né du fils du Ciel et d'Ungnyeo de la Terre, une fois adulte ?<br>
+                Découvrez la fondation du premier royaume de Corée dans le chapitre 7 !
+            </p>
+        </div>
+    </div>
+
+    <!-- Popups -->
+    <div id="vocab-popup-1" class="popup">
+        <h4 class="font-bold text-lg mb-2 text-primary">어휘 ✏️ 이름을 짓다</h4>
+        <p class="text-sm text-gray-700 leading-relaxed mb-4 text-left">En coréen, on n'utilise pas les verbes « choisir (고르다) » ou « trouver (찾다) » pour un prénom, car les prénoms sont généralement créés de toutes pièces en combinant des caractères. On utilise donc le verbe « 짓다 », qui signifie « fabriquer » ou « construire ».</p>
+        <button onclick="closePopup('vocab-popup-1')" class="btn-primary w-full justify-center">Fermer</button>
+    </div>
+
+    <div id="pop-10" class="popup">
+        <h4 class="font-bold text-lg mb-2 text-primary">문법 💡 V + -아/어 달라고</h4>
+        <p class="text-sm text-gray-700 leading-relaxed mb-4 text-left">Forme du discours indirect utilisée pour rapporter une demande (demander de faire quelque chose pour soi).</p>
+        <button onclick="closePopup('pop-10')" class="btn-primary w-full justify-center">Fermer</button>
+    </div>
+
+    <div id="pop-11" class="popup">
+        <h4 class="font-bold text-lg mb-2 text-primary">문법 💡 V + -아/어(서)</h4>
+        <p class="text-sm text-gray-700 leading-relaxed mb-4 text-left">Quand '-아/어서' indique la cause ou l'ordre séquentiel d'une action, on omet souvent le « 서 » Dans le langage écrit formel.</p>
+        <button onclick="closePopup('pop-11')" class="btn-primary w-full justify-center">Fermer</button>
+    </div>
+
+    <div id="pop-12" class="popup">
+        <h4 class="font-bold text-lg mb-2 text-primary">어휘 ✏️ 이름을 짓다</h4>
+        <p class="text-sm text-gray-700 leading-relaxed mb-4 text-left">En coréen, on n'utilise pas les verbes « choisir (고르다) » ou « trouver (찾다) » pour un prénom, car les prénoms sont généralement créés de toutes pièces en combinant des caractères. On utilise donc le verbe « 짓다 », qui signifie « fabriquer » ou « construire ».</p>
+        <button onclick="closePopup('pop-12')" class="btn-primary w-full justify-center">Fermer</button>
+    </div>
+
+    <!-- Nav -->
+    <div id="navBar" class="mt-auto p-4 flex justify-between items-center bg-white border-t border-gray-200 z-20" style="display:none;">
+        <button id="prevBtn" onclick="prevPage()" class="flex flex-col items-center text-primary disabled:opacity-20 px-4">
+            <i class="ph ph-caret-left text-2xl"></i>
+            <span class="nav-text">Précédent</span>
+        </button>
+        <span id="pageCounter" class="text-sm font-bold text-gray-400">1 / 14</span>
+        <button id="nextBtn" onclick="nextPage()" class="flex flex-col items-center text-primary disabled:opacity-20 px-4">
+            <i class="ph ph-caret-right text-2xl"></i>
+            <span class="nav-text">Suivant</span>
+        </button>
+    </div>
+</div>
+
+<script>
+    let currentPage = 0;
+    const totalPages = 13; // 0 to 13 = 14 pages total
+    let currentAudio = null;
+    let synth, successSynth, failSynth;
+
+    // 6강 단어 리스트
+    const korWords = ["사정", "결혼하다", "잠시", "변하다", "태어나다"];
+    const fraWords = ["situation/circonstances", "épouser", "un instant", "se transformer", "naître"];
+    const correctMatches = { "사정": "situation/circonstances", "결혼하다": "épouser", "잠시": "un instant", "변하다": "se transformer", "태어나다": "naître" };
+    
+    let selectedKor = null;
+    let selectedFra = null;
+    let matchesFound = 0;
+
+    let quizState = {};
+    let isPopupOpen = false;
+
+    const audioMap = {
+        1: 'https://res.cloudinary.com/de76i94ia/video/upload/v1773942187/6-all_voz7iz.wav',
+        3: 'https://res.cloudinary.com/de76i94ia/video/upload/v1773942292/6-1_drsg7a.mp3',
+        4: 'https://res.cloudinary.com/de76i94ia/video/upload/v1773942285/6-2_r2hbhp.mp3',
+        5: 'https://res.cloudinary.com/de76i94ia/video/upload/v1773942288/6-3_geaull.mp3',
+        6: 'https://res.cloudinary.com/de76i94ia/video/upload/v1773942297/6-4_m1ojiq.mp3',
+        7: 'https://res.cloudinary.com/de76i94ia/video/upload/v1773942187/6-all_voz7iz.wav' // Review Audio
+    };
+
+    window.onload = function() {
+        synth = new Tone.Synth().toDestination();
+        successSynth = new Tone.PolySynth().toDestination();
+        failSynth = new Tone.Synth({ oscillator: { type: "square" } }).toDestination();
+        initMatching();
+        updatePage();
+    };
+
+    function playTransitionSound() {
+        if(synth) synth.triggerAttackRelease("C6", "32n", "+0", 0.1);
+    }
+
+    function toggleAudio(url, btn) {
+        const icon = btn.querySelector('i');
+        const isSmall = btn.classList.contains('sm');
+        const playClass = isSmall ? 'ph ph-play text-xl' : 'ph ph-play text-3xl';
+        const pauseClass = isSmall ? 'ph ph-pause text-xl' : 'ph ph-pause text-3xl';
+
+        if (currentAudio && !currentAudio.paused && currentAudio.src.includes(url)) {
+            currentAudio.pause();
+            icon.className = playClass;
+        } else {
+            if (currentAudio) {
+                currentAudio.pause();
+            }
+            
+            document.querySelectorAll('.audio-btn-wrapper i').forEach(i => {
+                i.className = i.parentElement.classList.contains('sm') ? 'ph ph-play text-xl' : 'ph ph-play text-3xl';
+            });
+
+            currentAudio = new Audio(url);
+            
+            const playPromise = currentAudio.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    icon.className = pauseClass;
+                }).catch(error => {
+                    console.log("Audio play interrupted:", error);
+                    icon.className = playClass;
+                });
+            } else {
+                icon.className = pauseClass;
+            }
+
+            currentAudio.onended = () => icon.className = playClass;
+        }
+    }
+
+    function autoPlayAudio() {
+        if (audioMap[currentPage]) {
+            setTimeout(() => {
+                const activePage = document.getElementById(`page-${currentPage}`);
+                if (activePage) {
+                    const btn = activePage.querySelector('.audio-btn-wrapper');
+                    if(btn) toggleAudio(audioMap[currentPage], btn);
+                }
+            }, 500);
+        }
+    }
+
+    function nextPage() {
+        if (currentPage < totalPages) {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+            currentPage++;
+            playTransitionSound();
+            updatePage();
+            autoPlayAudio();
+        }
+    }
+
+    function prevPage() {
+        if (currentPage > 0) {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+            currentPage--;
+            playTransitionSound();
+            updatePage();
+            autoPlayAudio();
+        }
+    }
+
+    function updatePage() {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(`page-${currentPage}`).classList.add('active');
+        document.getElementById('progress').style.width = `${(currentPage / totalPages) * 100}%`;
+        document.getElementById('pageCounter').innerText = `${currentPage + 1} / ${totalPages + 1}`;
+        
+        const navBar = document.getElementById('navBar');
+        navBar.style.display = (currentPage === 0 || currentPage === totalPages) ? 'none' : 'flex';
+        
+        if (isPopupOpen) {
+            document.getElementById('prevBtn').disabled = true;
+            document.getElementById('nextBtn').disabled = true;
+            return; 
+        }
+
+        document.getElementById('prevBtn').disabled = (currentPage === 0);
+        
+        if (currentPage === 2 && matchesFound < korWords.length) {
+            document.getElementById('nextBtn').disabled = true;
+        } else if (currentPage >= 8 && currentPage <= 12 && !quizState[currentPage]) { 
+            document.getElementById('nextBtn').disabled = true;
+        } else {
+            document.getElementById('nextBtn').disabled = (currentPage === totalPages);
+        }
+
+        if (currentPage === totalPages && !window.lessonCompleted) {
+            window.lessonCompleted = true;
+            if (successSynth) {
+                const now = Tone.now();
+                successSynth.triggerAttackRelease("C5", "8n", now);
+                successSynth.triggerAttackRelease("E5", "8n", now + 0.15);
+                successSynth.triggerAttackRelease("G5", "8n", now + 0.3);
+                successSynth.triggerAttackRelease("C6", "2n", now + 0.45);
+            }
+            window.parent.postMessage({ type: 'lesson_complete' }, '*');
+        }
+    }
+
+    function checkQuiz(btn, isCorrect, popupId) {
+        if (quizState[currentPage]) return; 
+
+        if (isCorrect) {
+            btn.classList.add('correct');
+            if (successSynth) successSynth.triggerAttackRelease(["C5", "E5", "G5"], "8n");
+            
+            quizState[currentPage] = true; 
+            document.getElementById('nextBtn').disabled = false; 
+
+            if (popupId) {
+                setTimeout(() => openPopup(popupId), 500);
+            }
+        } else {
+            btn.classList.add('wrong');
+            if (failSynth) failSynth.triggerAttackRelease("C3", "8n", "+0", 0.5);
+            setTimeout(() => btn.classList.remove('wrong'), 800);
+        }
+    }
+
+    function openPopup(id) {
+        isPopupOpen = true;
+        document.getElementById(id).style.display = 'block';
+        updatePage(); 
+    }
+
+    function closePopup(id) {
+        isPopupOpen = false;
+        document.getElementById(id).style.display = 'none';
+        updatePage(); 
+    }
+
+    function initMatching() {
+        const korList = document.getElementById('kor-list');
+        const fraList = document.getElementById('fra-list');
+        [...korWords].sort(() => Math.random() - 0.5).forEach(w => {
+            const d = document.createElement('div');
+            d.className = 'match-item'; d.innerText = w;
+            d.onclick = () => selectMatch(d, 'kor');
+            korList.appendChild(d);
+        });
+        [...fraWords].sort(() => Math.random() - 0.5).forEach(w => {
+            const d = document.createElement('div');
+            d.className = 'match-item'; d.innerText = w;
+            d.onclick = () => selectMatch(d, 'fra');
+            fraList.appendChild(d);
+        });
+    }
+
+    function selectMatch(el, type) {
+        if (el.classList.contains('matched')) return;
+        if (type === 'kor') {
+            document.querySelectorAll('#kor-list .match-item').forEach(i => i.classList.remove('selected'));
+            selectedKor = el;
+        } else {
+            document.querySelectorAll('#fra-list .match-item').forEach(i => i.classList.remove('selected'));
+            selectedFra = el;
+        }
+        el.classList.add('selected');
+
+        if (selectedKor && selectedFra) {
+            if (correctMatches[selectedKor.innerText] === selectedFra.innerText) {
+                selectedKor.className = 'match-item matched';
+                selectedFra.className = 'match-item matched';
+                matchesFound++;
+                
+                if (successSynth) successSynth.triggerAttackRelease(["C5", "E5", "G5"], "8n");
+                
+                if (matchesFound === korWords.length) {
+                    document.getElementById('nextBtn').disabled = false;
+                }
+            } else {
+                const k = selectedKor, f = selectedFra;
+                if (failSynth) failSynth.triggerAttackRelease("C3", "8n", "+0", 0.5);
+                setTimeout(() => {
+                    k.classList.remove('selected');
+                    f.classList.remove('selected');
+                }, 400);
+            }
+            selectedKor = null; selectedFra = null;
+        }
+    }
+</script>
+
+</body>
+</html>
