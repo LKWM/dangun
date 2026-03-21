@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>단군신화 제7장: 고조선과 단군</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4a3728;
+            --secondary: #d4a373;
+            --accent: #bc6c25;
+            --bg-light: #fefae0;
+            --highlight: #e63946;
+        }
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #1a1a1a;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            width: 100vw;
+        }
+        #app-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 100vh * (16/9); 
+            aspect-ratio: 16/9;
+            background-color: var(--bg-light);
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        @media (max-aspect-ratio: 1/1) {
+            #app-container {
+                aspect-ratio: 9/16;
+                max-width: 100vw;
+                max-height: calc(100vw * (16/9));
+            }
+        }
+
+        .page {
+            display: none;
+            flex: 1;
+            padding: clamp(1rem, 3vh, 2rem);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            animation: fadeIn 0.4s ease-out;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+        }
+        .page.active { display: flex; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        .quiz-option {
+            width: 100%;
+            padding: clamp(0.5rem, 2vh, 1rem);
+            background: white;
+            border: 2px solid var(--secondary);
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+        }
+        .quiz-option.correct { background: #4ade80; border-color: #22c55e; color: white; }
+        .quiz-option.wrong { background: #f87171; border-color: #ef4444; color: white; }
+
+        .matching-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(0.4rem, 1.5vh, 0.75rem);
+            width: 100%;
+            max-width: 600px;
+        }
+        .match-item {
+            padding: clamp(0.5rem, 1.5vh, 0.75rem);
+            background: white;
+            border: 2px solid var(--secondary);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            user-select: none;
+            font-size: 0.95rem;
+        }
+        .match-item.selected { background: var(--secondary); color: white; }
+        .match-item.matched { background: #e2e8f0; color: #94a3b8; border-color: #cbd5e1; cursor: default; }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(0,0,0,0.05);
+            width: 100%;
+            position: absolute; top: 0; left: 0; z-index: 10;
+        }
+        .progress-inner { height: 100%; background: var(--accent); transition: width 0.3s ease; }
+
+        .popup {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: white; padding: 2rem; border-radius: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            z-index: 100; display: none; width: 85%; max-width: 400px;
+            border: 2px solid var(--secondary);
+        }
+
+        .highlight-text { color: var(--highlight); font-weight: 700; }
+
+        /* 오디오 버튼 이미지 스타일 */
+        .audio-btn-wrapper {
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 64px; height: 64px;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--primary);
+            border-radius: 50%;
+            color: white;
+            flex-shrink: 0;
+        }
+        .audio-btn-wrapper.sm { width: 48px; height: 48px; }
+        .audio-btn-wrapper:hover { transform: scale(1.1); }
+
+        .nav-text { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+        
+        .info-card {
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            border: 1px solid rgba(212, 163, 115, 0.3);
+            text-align: left;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    <div class="progress-bar"><div id="progress" class="progress-inner" style="width: 0%"></div></div>
+
+    <!-- Cover Page (0) -->
+    <div class="page active" id="page-0">
+        <div class="mb-2 text-accent font-bold tracking-widest text-sm">Le mythe de Dangun</div>
+        <h1 class="text-4xl md:text-6xl font-bold text-primary mb-4">제7장: 고조선과 단군</h1>
+        <p class="text-xl text-gray-600 mb-10">Gojoseon et Dangun</p>
+        <button onclick="nextPage()" class="btn-primary px-10 py-4">
+            Commencer <i class="ph ph-play-circle text-2xl"></i>
+        </button>
+    </div>
+
+    <!-- Page 1: Listen to Story (1) -->
+    <div class="page" id="page-1">
+        <h2 class="text-2xl font-bold mb-6 text-primary">이야기를 읽어 보세요.</h2>
+        <img src="https://res.cloudinary.com/de76i94ia/image/upload/v1774073074/illust_-7_8_gfw66v.png" alt="Illustration" class="w-full max-w-sm md:max-w-md h-auto rounded-xl shadow-lg mb-6">
+        <div class="audio-btn-wrapper" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1774073070/7-all_gbsdkw.wav', this)">
+            <i class="ph ph-play text-3xl"></i>
+        </div>
+    </div>
+
+    <!-- Page 2: Vocabulary Match (2) -->
+    <div class="page" id="page-2">
+        <h2 class="text-xl md:text-2xl font-bold mb-6 text-primary">Associez les mots coréens à leur traduction française.</h2>
+        <div class="matching-container">
+            <div id="kor-list" class="flex flex-col gap-1.5"></div>
+            <div id="fra-list" class="flex flex-col gap-1.5"></div>
+        </div>
+    </div>
+
+    <!-- Page 3: Story 1 + Grammar Merged (3) -->
+    <div class="page" id="page-3">
+        <div class="text-xl md:text-2xl mb-4 text-primary leading-loose font-medium">
+            단군은 평양성을 수도<span class="highlight-text">로 정하고</span> 나라를 세워 '조선'이라고 불렀습니다.
+        </div>
+        <div class="audio-btn-wrapper sm mb-4 mx-auto" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1774073051/7-1_mqnng6.mp3', this)">
+            <i class="ph ph-play text-xl"></i>
+        </div>
+        <p class="mb-6 text-sm md:text-base text-gray-500 italic">Dangun a désigné le château de Pyongyang comme capitale, a fondé un pays et l'a appelé « Joseon ».</p>
+        
+        <div class="info-card max-w-xl mx-auto py-3">
+            <h3 class="text-base font-bold mb-1 text-primary">문법 💡 N + (으)로 정하다</h3>
+            <p class="text-xs md:text-sm text-gray-700 leading-relaxed mb-2">Signifie « fixer comme [N] » ou « désigner comme [N] ».</p>
+            <ul class="text-xs md:text-sm text-gray-600 list-disc list-inside space-y-1 text-left">
+                <li><span class="font-medium text-gray-800">다음 모임 장소를 카페로 정했습니다.</span> - Nous avons fixé le café comme lieu de la prochaine réunion.</li>
+                <li><span class="font-medium text-gray-800">회의 시간을 오후 3시로 정했어요.</span> - J'ai fixé l'heure de la réunion à 15 heures.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Page 4: Story 2 (4) -->
+    <div class="page" id="page-4">
+        <div class="text-xl md:text-2xl mb-8 text-primary leading-loose font-medium">
+            이 나라가 한국 역사에서 가장 처음 세워진 나라입니다.
+        </div>
+        <div class="audio-btn-wrapper mb-8 mx-auto" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1774073054/7-2_furadl.mp3', this)">
+            <i class="ph ph-play text-3xl"></i>
+        </div>
+        <p class="mt-4 text-sm md:text-base text-gray-500 italic">Ce pays est le tout premier fondé dans l'histoire de la Corée.</p>
+    </div>
+
+    <!-- Page 5: Story 3 (5) -->
+    <div class="page" id="page-5">
+        <div class="text-xl md:text-2xl mb-8 text-primary leading-loose font-medium">
+            단군은 오랫동안 백성들을 평화롭게 잘 다스렸습니다.
+        </div>
+        <div class="audio-btn-wrapper mb-8 mx-auto" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1774073058/7-3_mfehv9.mp3', this)">
+            <i class="ph ph-play text-3xl"></i>
+        </div>
+        <p class="mt-4 text-sm md:text-base text-gray-500 italic">Dangun a bien gouverné le peuple paisiblement pendant longtemps.</p>
+    </div>
+
+    <!-- Page 6: Story 4 + Grammar Merged (6) -->
+    <div class="page" id="page-6">
+        <div class="text-xl md:text-2xl mb-4 text-primary leading-loose font-medium">
+            세월이 흘러 주나라에서 '기자'라는 사람이 오<span class="highlight-text">자</span>, 단군은 아사달로 가서 산의 신인 '산신'이 되었습니다.
+        </div>
+        <div class="audio-btn-wrapper sm mb-4 mx-auto" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1774073062/7-4_s2zm8g.mp3', this)">
+            <i class="ph ph-play text-xl"></i>
+        </div>
+        <p class="mb-6 text-sm md:text-base text-gray-500 italic">Au fil du temps, lorsque quelqu'un nommé « Gija » est arrivé de la dynastie Zhou, Dangun est allé à Asadal et est devenu le dieu de la montagne, « Sansin ».</p>
+        
+        <div class="info-card max-w-xl mx-auto py-3">
+            <h3 class="text-base font-bold mb-1 text-primary">문법 💡 V + -자</h3>
+            <p class="text-xs md:text-sm text-gray-700 leading-relaxed mb-2">Terminaison conjonctive indiquant que l'action précédente est la cause ou la motivation pour que l'action suivante se produise.</p>
+            <ul class="text-xs md:text-sm text-gray-600 list-disc list-inside space-y-1 text-left">
+                <li><span class="font-medium text-gray-800">경찰이 오자 도둑이 도망갔어요.</span> - Dès que la police est arrivée, le voleur s'est enfui.</li>
+                <li><span class="font-medium text-gray-800">엄마가 화를 내자 아이가 울었어요.</span> - Comme la mère s'est fâchée, l'enfant a pleuré.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Page 7: Story 5 + Vocab Popups + Grammar Merged (7) -->
+    <div class="page" id="page-7">
+        <div class="text-lg md:text-xl mb-3 text-primary leading-relaxed font-medium">
+            <span class="text-blue-600 font-bold cursor-pointer border-b-2 border-dashed border-blue-600 hover:opacity-70 transition-opacity" onclick="openPopup('vocab-popup-1')">그</span>의 나이는 <span class="text-blue-600 font-bold cursor-pointer border-b-2 border-dashed border-blue-600 hover:opacity-70 transition-opacity" onclick="openPopup('vocab-popup-2')">무려</span> 1,908세였<span class="highlight-text">다고</span> <span class="text-blue-600 font-bold cursor-pointer border-b-2 border-dashed border-blue-600 hover:opacity-70 transition-opacity" onclick="openPopup('vocab-popup-3')">전해집니다</span>.
+        </div>
+        <div class="audio-btn-wrapper sm mb-3 mx-auto" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1774073066/7-5_pii5cd.mp3', this)">
+            <i class="ph ph-play text-xl"></i>
+        </div>
+        <p class="mb-4 text-xs md:text-sm text-gray-500 italic">On raconte que son âge n'était pas moins de 1 908 ans.</p>
+        
+        <div class="info-card max-w-xl mx-auto">
+            <h3 class="text-base font-bold mb-1 text-primary">문법 💡 -다고</h3>
+            <p class="text-xs md:text-sm text-gray-700 leading-relaxed mb-2">Forme du discours indirect utilisée pour rapporter ce que quelqu'un a dit (« dire que... ») ou ce qui est transmis/raconté. S'attache au radical d'un adjectif ou après les terminaisons '-으시-' (honorifique), '-었-' (passé), '-겠-' (futur).</p>
+            <ul class="text-xs md:text-sm text-gray-600 list-disc list-inside space-y-1 text-left">
+                <li><span class="font-medium text-gray-800">친구가 날씨가 춥다고 했어요.</span> - Mon ami a dit qu'il faisait froid.</li>
+                <li><span class="font-medium text-gray-800">한국 사람들은 성격이 급하다고 알려져 있어요.</span> - Il est connu que les Coréens sont impatients.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Page 8: Review (8) -->
+    <div class="page" id="page-8">
+        <h2 class="text-xl md:text-3xl font-bold mb-4 md:mb-6 text-primary">이야기를 다시 한 번 읽어 보세요.</h2>
+        <div class="bg-white p-6 md:p-10 rounded-xl shadow-inner text-left text-sm md:text-lg lg:text-xl leading-loose mb-6 max-w-3xl border border-secondary/20">
+            단군은 평양성을 수도로 정하고 나라를 세워 '조선'이라고 불렀습니다. 이 나라가 한국 역사에서 가장 처음 세워진 나라입니다. 단군은 오랫동안 백성들을 평화롭게 잘 다스렸습니다. 세월이 흘러 주나라에서 '기자'라는 사람이 오자, 단군은 아사달로 가서 산의 신인 '산신'이 되었습니다. 그의 나이는 무려 1,908세였다고 전해집니다.
+        </div>
+        <div class="audio-btn-wrapper mx-auto" onclick="toggleAudio('https://res.cloudinary.com/de76i94ia/video/upload/v1774073070/7-all_gbsdkw.wav', this)">
+            <i class="ph ph-play text-3xl"></i>
+        </div>
+    </div>
+
+    <!-- Quiz Pages 9~13 -->
+    <div class="page" id="page-9">
+        <h3 class="text-lg md:text-2xl font-bold mb-4 md:mb-8 text-primary">단군은 나라를 세우고 무엇이라고 불렀나요?</h3>
+        <div class="flex flex-col w-full max-w-md items-center gap-2 md:gap-3">
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">고구려</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">백제</button>
+            <button onclick="checkQuiz(this, true)" class="quiz-option text-sm md:text-lg">조선</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">신라</button>
+        </div>
+    </div>
+
+    <div class="page" id="page-10">
+        <h3 class="text-lg md:text-2xl font-bold mb-4 md:mb-8 text-primary">단군은 아사달로 가서 무엇이 되었나요?</h3>
+        <div class="flex flex-col w-full max-w-md items-center gap-2 md:gap-3">
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">구름의 신</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">곰</button>
+            <button onclick="checkQuiz(this, true)" class="quiz-option text-sm md:text-lg">산신</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">바다의 신</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">환웅</button>
+        </div>
+    </div>
+
+    <div class="page" id="page-11">
+        <p class="mb-2 md:mb-4 text-gray-500 text-xs md:text-sm">J'ai fixé l'heure du rendez-vous à 2 heures.</p>
+        <h3 class="text-lg md:text-2xl font-bold mb-4 md:mb-8 text-primary">약속 시간을 2시_정했습니다.</h3>
+        <div class="flex flex-col w-full max-w-md items-center gap-2 md:gap-3">
+            <button onclick="checkQuiz(this, true, 'pop-11')" class="quiz-option text-sm md:text-lg">로</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">라고</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">에</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">까지</button>
+        </div>
+    </div>
+
+    <div class="page" id="page-12">
+        <p class="mb-2 md:mb-4 text-gray-500 text-xs md:text-sm">Dès que j'ai mangé le concombre, j'ai commencé à éternuer.</p>
+        <h3 class="text-lg md:text-2xl font-bold mb-4 md:mb-8 text-primary">오이를 __ 재채기를 하기 시작했어요.</h3>
+        <div class="flex flex-col w-full max-w-md items-center gap-2 md:gap-3">
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">먹으니까</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">먹고 나서</button>
+            <button onclick="checkQuiz(this, true, 'pop-12')" class="quiz-option text-sm md:text-lg">먹자</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">먹으면</button>
+        </div>
+    </div>
+
+    <div class="page" id="page-13">
+        <p class="mb-2 md:mb-4 text-gray-500 text-xs md:text-sm">Il a dit qu'il faisait froid.</p>
+        <h3 class="text-lg md:text-2xl font-bold mb-4 md:mb-8 text-primary">날씨가 ___ 말했습니다.</h3>
+        <div class="flex flex-col w-full max-w-md items-center gap-2 md:gap-3">
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">추우니</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">추워서</button>
+            <button onclick="checkQuiz(this, true, 'pop-13')" class="quiz-option text-sm md:text-lg">춥다고</button>
+            <button onclick="checkQuiz(this, false)" class="quiz-option text-sm md:text-lg">추우라고</button>
+        </div>
+    </div>
+
+    <!-- Outro (14) -->
+    <div class="page" id="page-14">
+        <div class="mb-2 md:mb-4 text-accent"><i class="ph ph-sparkle text-4xl md:text-6xl"></i></div>
+        <div class="bg-white p-4 md:p-8 rounded-2xl mb-4 md:mb-8 max-w-lg shadow-sm w-full">
+            <h3 class="text-base md:text-xl font-bold mb-2 md:mb-4 text-primary">드디어 단군신화를 끝까지 다 읽었네요!</h3>
+            <p class="text-xs md:text-base text-gray-700 leading-snug md:leading-relaxed">이 이야기는 앞으로 여러분이 한국 문화와 역사를 이해하는 데 많은 도움이 될 거예요. 다음 레슨에서는 지금까지 배운 문법을 다시 정리하는 시간을 가져볼 거랍니다.<br>그럼, 다음 레슨에서 만나요!</p>
+            <hr class="my-2 md:my-4 border-gray-200">
+            <p class="text-gray-500 italic text-[11px] md:text-sm leading-tight md:leading-relaxed">
+                Vous avez enfin lu le mythe de Dangun jusqu'à la fin !<br>
+                Cette histoire vous sera très utile pour comprendre la culture et l'histoire coréennes à l'avenir. Dans la prochaine leçon, nous prendrons le temps de réviser la grammaire que nous avons apprise jusqu'à présent.<br>
+                Alors, à la prochaine leçon !
+            </p>
+        </div>
+    </div>
+
+    <!-- Popups -->
+    <div id="vocab-popup-1" class="popup">
+        <h4 class="font-bold text-lg mb-2 text-primary">어휘 ✏️ 그</h4>
+        <p class="text-sm text-gray-700 leading-relaxed mb-4 text-left">Pronom personnel masculin à la 3e personne du singulier. Il n'est pas utilisé dans le langage parlé, mais uniquement dans l'écriture ou la traduction.</p>
+        <button onclick="closePopup('vocab-popup-1')" class="btn-primary w-full justify-center">Fermer</button>
+    </div>
+    
+    <div id="vocab-popup-2" class="popup">
+        <h4 class="font-bold text-lg mb-2 text-primary">어휘 ✏️ 무려</h4>
+        <p class="text-sm text-gray-700 leading-relaxed mb-4 text-left">Utilisé pour indiquer une quantité considérablement grande.</p>
+        <button onclick="closePopup('vocab-popup-2')" class="btn-primary w-full justify-center">Fermer</button>
+    </div>
+
+    <div id="vocab-popup-3" class="popup">
+        <h4 class="font-bold text-lg mb-2 text-primary">어휘 ✏️ 전해지다</h4>
+        <p class="text-sm text-gray-700 leading-relaxed mb-4 text-left">Verbe composée de « 전하다 » (informer/transmettre) et de « -아/어지다 »(voix passif). Elle indique qu'une histoire ou une information est transmise de bouche à oreille, sans que l'on connaisse précisément l'auteur ou le sujet de cette transmission.</p>
+        <button onclick="closePopup('vocab-popup-3')" class="btn-primary w-full justify-center">Fermer</button>
+    </div>
+
+    <div id="pop-11" class="popup">
+        <h4 class="font-bold text-lg mb-2 text-primary">문법 💡 N + (으)로 정하다</h4>
+        <p class="text-sm text-gray-700 leading-relaxed mb-4 text-left">Signifie « fixer comme [N] » ou « désigner comme [N] ».</p>
+        <button onclick="closePopup('pop-11')" class="btn-primary w-full justify-center">Fermer</button>
+    </div>
+
+    <div id="pop-12" class="popup">
+        <h4 class="font-bold text-lg mb-2 text-primary">문법 💡 V + -자</h4>
+        <p class="text-sm text-gray-700 leading-relaxed mb-4 text-left">Terminaison conjonctive indiquant que l'action précédente est la cause ou la motivation pour que l'action suivante se produise.</p>
+        <button onclick="closePopup('pop-12')" class="btn-primary w-full justify-center">Fermer</button>
+    </div>
+
+    <div id="pop-13" class="popup">
+        <h4 class="font-bold text-lg mb-2 text-primary">문법 💡 -다고</h4>
+        <p class="text-sm text-gray-700 leading-relaxed mb-4 text-left">Forme du discours indirect utilisée pour rapporter ce que quelqu'un a dit (« dire que... ») ou ce qui est transmis/raconté. S'attache au radical d'un adjectif ou après les terminaisons '-으시-' (honorifique), '-었-' (passé), '-겠-' (futur).</p>
+        <button onclick="closePopup('pop-13')" class="btn-primary w-full justify-center">Fermer</button>
+    </div>
+
+    <!-- Nav -->
+    <div id="navBar" class="mt-auto p-4 flex justify-between items-center bg-white border-t border-gray-200 z-20" style="display:none;">
+        <button id="prevBtn" onclick="prevPage()" class="flex flex-col items-center text-primary disabled:opacity-20 px-4">
+            <i class="ph ph-caret-left text-2xl"></i>
+            <span class="nav-text">Précédent</span>
+        </button>
+        <span id="pageCounter" class="text-sm font-bold text-gray-400">1 / 15</span>
+        <button id="nextBtn" onclick="nextPage()" class="flex flex-col items-center text-primary disabled:opacity-20 px-4">
+            <i class="ph ph-caret-right text-2xl"></i>
+            <span class="nav-text">Suivant</span>
+        </button>
+    </div>
+</div>
+
+<script>
+    let currentPage = 0;
+    const totalPages = 14; // 0 to 14 = 15 pages total
+    let currentAudio = null;
+    let synth, successSynth, failSynth;
+
+    // 7강 단어 리스트
+    const korWords = ["수도", "백성", "세월이 흐르다", "산신", "무려", "평화롭게"];
+    const fraWords = ["capitale", "peuple", "le temps passe", "dieu de la montagne", "pas moins de", "paisiblement"];
+    const correctMatches = { "수도": "capitale", "백성": "peuple", "세월이 흐르다": "le temps passe", "산신": "dieu de la montagne", "무려": "pas moins de", "평화롭게": "paisiblement" };
+    
+    let selectedKor = null;
+    let selectedFra = null;
+    let matchesFound = 0;
+
+    let quizState = {};
+    let isPopupOpen = false;
+
+    const audioMap = {
+        1: 'https://res.cloudinary.com/de76i94ia/video/upload/v1774073070/7-all_gbsdkw.wav',
+        3: 'https://res.cloudinary.com/de76i94ia/video/upload/v1774073051/7-1_mqnng6.mp3',
+        4: 'https://res.cloudinary.com/de76i94ia/video/upload/v1774073054/7-2_furadl.mp3',
+        5: 'https://res.cloudinary.com/de76i94ia/video/upload/v1774073058/7-3_mfehv9.mp3',
+        6: 'https://res.cloudinary.com/de76i94ia/video/upload/v1774073062/7-4_s2zm8g.mp3',
+        7: 'https://res.cloudinary.com/de76i94ia/video/upload/v1774073066/7-5_pii5cd.mp3',
+        8: 'https://res.cloudinary.com/de76i94ia/video/upload/v1774073070/7-all_gbsdkw.wav' // Review Audio
+    };
+
+    window.onload = function() {
+        synth = new Tone.Synth().toDestination();
+        successSynth = new Tone.PolySynth().toDestination();
+        failSynth = new Tone.Synth({ oscillator: { type: "square" } }).toDestination();
+        initMatching();
+        updatePage();
+    };
+
+    function playTransitionSound() {
+        if(synth) synth.triggerAttackRelease("C6", "32n", "+0", 0.1);
+    }
+
+    function toggleAudio(url, btn) {
+        const icon = btn.querySelector('i');
+        const isSmall = btn.classList.contains('sm');
+        const playClass = isSmall ? 'ph ph-play text-xl' : 'ph ph-play text-3xl';
+        const pauseClass = isSmall ? 'ph ph-pause text-xl' : 'ph ph-pause text-3xl';
+
+        if (currentAudio && !currentAudio.paused && currentAudio.src.includes(url)) {
+            currentAudio.pause();
+            icon.className = playClass;
+        } else {
+            if (currentAudio) {
+                currentAudio.pause();
+            }
+            
+            document.querySelectorAll('.audio-btn-wrapper i').forEach(i => {
+                i.className = i.parentElement.classList.contains('sm') ? 'ph ph-play text-xl' : 'ph ph-play text-3xl';
+            });
+
+            currentAudio = new Audio(url);
+            
+            const playPromise = currentAudio.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    icon.className = pauseClass;
+                }).catch(error => {
+                    console.log("Audio play interrupted:", error);
+                    icon.className = playClass;
+                });
+            } else {
+                icon.className = pauseClass;
+            }
+
+            currentAudio.onended = () => icon.className = playClass;
+        }
+    }
+
+    function autoPlayAudio() {
+        if (audioMap[currentPage]) {
+            setTimeout(() => {
+                const activePage = document.getElementById(`page-${currentPage}`);
+                if (activePage) {
+                    const btn = activePage.querySelector('.audio-btn-wrapper');
+                    if(btn) toggleAudio(audioMap[currentPage], btn);
+                }
+            }, 500);
+        }
+    }
+
+    function nextPage() {
+        if (currentPage < totalPages) {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+            currentPage++;
+            playTransitionSound();
+            updatePage();
+            autoPlayAudio();
+        }
+    }
+
+    function prevPage() {
+        if (currentPage > 0) {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+            currentPage--;
+            playTransitionSound();
+            updatePage();
+            autoPlayAudio();
+        }
+    }
+
+    function updatePage() {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(`page-${currentPage}`).classList.add('active');
+        document.getElementById('progress').style.width = `${(currentPage / totalPages) * 100}%`;
+        document.getElementById('pageCounter').innerText = `${currentPage + 1} / ${totalPages + 1}`;
+        
+        const navBar = document.getElementById('navBar');
+        navBar.style.display = (currentPage === 0 || currentPage === totalPages) ? 'none' : 'flex';
+        
+        if (isPopupOpen) {
+            document.getElementById('prevBtn').disabled = true;
+            document.getElementById('nextBtn').disabled = true;
+            return; 
+        }
+
+        document.getElementById('prevBtn').disabled = (currentPage === 0);
+        
+        if (currentPage === 2 && matchesFound < korWords.length) {
+            document.getElementById('nextBtn').disabled = true;
+        } else if (currentPage >= 9 && currentPage <= 13 && !quizState[currentPage]) { 
+            document.getElementById('nextBtn').disabled = true;
+        } else {
+            document.getElementById('nextBtn').disabled = (currentPage === totalPages);
+        }
+
+        if (currentPage === totalPages && !window.lessonCompleted) {
+            window.lessonCompleted = true;
+            if (successSynth) {
+                const now = Tone.now();
+                successSynth.triggerAttackRelease("C5", "8n", now);
+                successSynth.triggerAttackRelease("E5", "8n", now + 0.15);
+                successSynth.triggerAttackRelease("G5", "8n", now + 0.3);
+                successSynth.triggerAttackRelease("C6", "2n", now + 0.45);
+            }
+            window.parent.postMessage({ type: 'lesson_complete' }, '*');
+        }
+    }
+
+    function checkQuiz(btn, isCorrect, popupId) {
+        if (quizState[currentPage]) return; 
+
+        if (isCorrect) {
+            btn.classList.add('correct');
+            if (successSynth) successSynth.triggerAttackRelease(["C5", "E5", "G5"], "8n");
+            
+            quizState[currentPage] = true; 
+            document.getElementById('nextBtn').disabled = false; 
+
+            if (popupId) {
+                setTimeout(() => openPopup(popupId), 500);
+            }
+        } else {
+            btn.classList.add('wrong');
+            if (failSynth) failSynth.triggerAttackRelease("C3", "8n", "+0", 0.5);
+            setTimeout(() => btn.classList.remove('wrong'), 800);
+        }
+    }
+
+    function openPopup(id) {
+        isPopupOpen = true;
+        document.getElementById(id).style.display = 'block';
+        updatePage(); 
+    }
+
+    function closePopup(id) {
+        isPopupOpen = false;
+        document.getElementById(id).style.display = 'none';
+        updatePage(); 
+    }
+
+    function initMatching() {
+        const korList = document.getElementById('kor-list');
+        const fraList = document.getElementById('fra-list');
+        [...korWords].sort(() => Math.random() - 0.5).forEach(w => {
+            const d = document.createElement('div');
+            d.className = 'match-item'; d.innerText = w;
+            d.onclick = () => selectMatch(d, 'kor');
+            korList.appendChild(d);
+        });
+        [...fraWords].sort(() => Math.random() - 0.5).forEach(w => {
+            const d = document.createElement('div');
+            d.className = 'match-item'; d.innerText = w;
+            d.onclick = () => selectMatch(d, 'fra');
+            fraList.appendChild(d);
+        });
+    }
+
+    function selectMatch(el, type) {
+        if (el.classList.contains('matched')) return;
+        if (type === 'kor') {
+            document.querySelectorAll('#kor-list .match-item').forEach(i => i.classList.remove('selected'));
+            selectedKor = el;
+        } else {
+            document.querySelectorAll('#fra-list .match-item').forEach(i => i.classList.remove('selected'));
+            selectedFra = el;
+        }
+        el.classList.add('selected');
+
+        if (selectedKor && selectedFra) {
+            if (correctMatches[selectedKor.innerText] === selectedFra.innerText) {
+                selectedKor.className = 'match-item matched';
+                selectedFra.className = 'match-item matched';
+                matchesFound++;
+                
+                if (successSynth) successSynth.triggerAttackRelease(["C5", "E5", "G5"], "8n");
+                
+                if (matchesFound === korWords.length) {
+                    document.getElementById('nextBtn').disabled = false;
+                }
+            } else {
+                const k = selectedKor, f = selectedFra;
+                if (failSynth) failSynth.triggerAttackRelease("C3", "8n", "+0", 0.5);
+                setTimeout(() => {
+                    k.classList.remove('selected');
+                    f.classList.remove('selected');
+                }, 400);
+            }
+            selectedKor = null; selectedFra = null;
+        }
+    }
+</script>
+
+</body>
+</html>
