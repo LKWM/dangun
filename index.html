@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>단군신화: L’introduction</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4a3728;
+            --secondary: #d4a373;
+            --accent: #bc6c25;
+            --bg-light: #fefae0;
+            --highlight: #e63946;
+        }
+        body, html {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #1a1a1a;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: none;
+        }
+        #app-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 100vh * (16/9); 
+            aspect-ratio: 16/9;
+            background-color: var(--bg-light);
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        @media (max-aspect-ratio: 1/1) {
+            #app-container {
+                aspect-ratio: 9/16;
+                max-width: 100vw;
+                max-height: calc(100vw * (16/9));
+            }
+        }
+
+        .page {
+            display: none;
+            flex: 1;
+            padding: clamp(1rem, 3vh, 2rem) clamp(1rem, 4vw, 3rem);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            animation: fadeIn 0.4s ease-out;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            overflow: hidden;
+            gap: clamp(0.5rem, 2vh, 1.5rem);
+        }
+        .page.active { display: flex; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .text-fluid-lg { font-size: clamp(1.2rem, 3vh, 2rem); line-height: 1.4; }
+        .text-fluid-md { font-size: clamp(1rem, 2.5vh, 1.5rem); line-height: 1.6; }
+        .text-fluid-sm { font-size: clamp(0.85rem, 2.2vh, 1.15rem); line-height: 1.8; }
+        .text-fluid-xs { font-size: clamp(0.7rem, 1.5vh, 0.95rem); line-height: 1.4; }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            padding: clamp(0.5rem, 1.5vh, 1rem) clamp(1rem, 3vw, 2rem);
+            border-radius: 9999px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            font-size: clamp(0.9rem, 2vh, 1.2rem);
+            cursor: pointer;
+            border: none;
+        }
+        .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(74, 55, 40, 0.3); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .progress-bar {
+            height: clamp(4px, 1vh, 8px);
+            background: rgba(0,0,0,0.05);
+            width: 100%;
+            position: absolute; top: 0; left: 0; z-index: 10;
+        }
+        .progress-inner { height: 100%; background: var(--accent); transition: width 0.3s ease; }
+
+        .nav-text { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+        
+        #navBar {
+            height: clamp(60px, 8vh, 80px);
+            padding: 0 clamp(1rem, 3vw, 2rem);
+        }
+        
+        .audio-playing-indicator {
+            position: absolute; top: 20px; right: 20px;
+            display: flex; gap: 3px; align-items: flex-end; height: 15px;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .audio-playing-indicator.active { opacity: 0.5; }
+        .bar { width: 3px; background: var(--primary); animation: sound 0px -800ms linear infinite alternate; }
+        @keyframes sound { 0% { height: 3px; } 100% { height: 15px; } }
+        .bar:nth-child(1) { animation-duration: 474ms; }
+        .bar:nth-child(2) { animation-duration: 433ms; }
+        .bar:nth-child(3) { animation-duration: 407ms; }
+
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    <div class="progress-bar"><div id="progress" class="progress-inner" style="width: 0%"></div></div>
+    
+    <div class="audio-playing-indicator" id="audioIndicator">
+        <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+    </div>
+
+    <!-- Cover (0) -->
+    <div class="page active" id="page-0">
+        <div class="mb-2 text-accent font-bold tracking-widest text-sm uppercase">단군신화 Le mythe de Dangun</div>
+        <h1 class="text-4xl md:text-6xl font-bold text-primary mb-4 leading-tight">L’introduction</h1>
+        <button onclick="nextPage()" class="btn-primary mt-8">
+            Commencer <i class="ph ph-arrow-right text-xl"></i>
+        </button>
+    </div>
+
+    <!-- Page 1 (1) -->
+    <div class="page" id="page-1">
+        <i class="ph ph-hand-waving text-5xl text-accent mb-4"></i>
+        <div class="bg-white p-5 md:p-8 rounded-2xl shadow-sm border border-secondary w-full max-w-3xl flex flex-col gap-4 items-center text-center">
+            <p class="text-fluid-sm text-gray-800 m-0">
+                Bonjour ! Je m'appelle Jinwoo, je serai votre guide dans ce programme.
+            </p>
+            <p class="text-fluid-sm text-gray-800 m-0">
+                Dans ce programme, nous allons découvrir ensemble l'histoire du « mythe de Dangun ». Il s'agit du mythe fondateur du tout premier pays établi sur la péninsule coréenne, là où se trouvent aujourd'hui la Corée du Sud et la Corée du Nord. C'est l'histoire que tous les Coréens apprennent lorsqu'ils commencent à étudier l'histoire.
+            </p>
+        </div>
+    </div>
+
+    <!-- Page 2 (2) -->
+    <div class="page" id="page-2">
+        <i class="ph ph-book-open-text text-5xl text-accent mb-4"></i>
+        <div class="bg-white p-5 md:p-8 rounded-2xl shadow-sm border border-secondary w-full max-w-3xl flex flex-col gap-4 items-center text-center">
+            <p class="text-fluid-sm text-gray-800 m-0">
+                Le mythe de Dangun est une histoire consignée dans un livre appelé « Samguk Yusa », compilé en 1218 par le moine Iryeon à l'époque Goryeo.
+            </p>
+            <p class="text-fluid-sm text-gray-800 m-0">
+                À travers cette histoire, on apprend que le royaume de Gojoseon considérait la patience et la vertu comme des valeurs plus importantes que la lutte ou la force.
+            </p>
+        </div>
+    </div>
+
+    <!-- Page 3 (3) -->
+    <div class="page" id="page-3">
+        <i class="ph ph-list-numbers text-5xl text-accent mb-4"></i>
+        <div class="bg-white p-5 md:p-8 rounded-2xl shadow-sm border border-secondary w-full max-w-3xl flex flex-col gap-4 items-center text-center">
+            <p class="text-fluid-sm text-gray-800 m-0">
+                Dans ce programme, nous présenterons le mythe de Dangun divisé en 7 chapitres. Chaque chapitre est composé de 3 à 4 phrases.
+            </p>
+            <p class="text-fluid-sm text-gray-800 m-0">
+                Tout d'abord, nous commencerons par écouter le livre audio, puis nous examinerons à nouveau chaque phrase en expliquant la grammaire et le vocabulaire essentiels. Enfin, nous réécouterons l'histoire et ferons des exercices liés au contenu, à la grammaire et au vocabulaire que nous venons d'apprendre.
+            </p>
+        </div>
+    </div>
+
+    <!-- Page 4 (4) -->
+    <div class="page" id="page-4">
+        <i class="ph ph-student text-5xl text-accent mb-4"></i>
+        <div class="bg-white p-5 md:p-8 rounded-2xl shadow-sm border border-secondary w-full max-w-3xl flex flex-col gap-4 items-center text-center">
+            <p class="text-fluid-sm text-gray-800 m-0">
+                Ce programme a été conçu pour les apprenants de niveau B1. Particulièrement en matière de grammaire, ce sera un excellent support pour apprendre les différentes manières d'utiliser le discours direct et le discours indirect.
+            </p>
+            <p class="text-fluid-sm text-gray-800 m-0">
+                Une leçon expliquant la grammaire en détail est également prévue à la fin du programme.
+            </p>
+        </div>
+    </div>
+
+    <!-- Page 5 (5) - Outro -->
+    <div class="page" id="page-5">
+        <i class="ph ph-sparkle text-6xl text-accent mb-4"></i>
+        <div class="bg-white p-5 md:p-8 rounded-2xl shadow-sm border border-secondary w-full max-w-3xl flex flex-col gap-4 items-center text-center">
+            <p class="text-fluid-sm text-gray-800 m-0">
+                Alors, allons écouter l'histoire incontournable que tout Coréen connaît : le mythe de Dangun !
+            </p>
+            <p class="text-fluid-sm font-bold text-primary m-0 mt-2">
+                Si vous êtes prêts, on se retrouve dans la leçon 1 !
+            </p>
+        </div>
+    </div>
+
+    <!-- Nav -->
+    <div id="navBar" class="mt-auto p-4 flex justify-between items-center bg-white border-t border-gray-200 z-20 w-full" style="display:none;">
+        <button id="prevBtn" onclick="prevPage()" class="flex flex-col items-center text-primary disabled:opacity-20 px-4">
+            <i class="ph ph-caret-left text-2xl"></i>
+            <span class="nav-text">Précédent</span>
+        </button>
+        <span id="pageCounter" class="text-sm font-bold text-gray-400">1 / 6</span>
+        <button id="nextBtn" onclick="nextPage()" class="flex flex-col items-center text-primary disabled:opacity-20 px-4">
+            <i class="ph ph-caret-right text-2xl"></i>
+            <span class="nav-text">Suivant</span>
+        </button>
+    </div>
+</div>
+
+<script>
+    let currentPage = 0;
+    const totalPages = 5;
+    let currentAudio = null;
+    let synth, successSynth;
+    let playTimeout = null;
+
+    const audioMap = {
+        1: 'https://res.cloudinary.com/de76i94ia/video/upload/v1774349660/0-1_qrn6eg.mp3',
+        2: 'https://res.cloudinary.com/de76i94ia/video/upload/v1774349664/0-2_xclvb7.mp3',
+        3: 'https://res.cloudinary.com/de76i94ia/video/upload/v1774349670/0-3_yq2aep.mp3',
+        4: 'https://res.cloudinary.com/de76i94ia/video/upload/v1774349677/0-4_weavno.mp3',
+        5: 'https://res.cloudinary.com/de76i94ia/video/upload/v1774349681/0-5_tihmc3.mp3'
+    };
+
+    window.onload = function() {
+        synth = new Tone.Synth().toDestination();
+        successSynth = new Tone.PolySynth().toDestination();
+        updatePage();
+    };
+
+    function playTransitionSound() {
+        if(synth) synth.triggerAttackRelease("C6", "32n", "+0", 0.05);
+    }
+
+    function stopAudio() {
+        if (playTimeout) {
+            clearTimeout(playTimeout);
+            playTimeout = null;
+        }
+        if (currentAudio) {
+            currentAudio.pause();
+            currentAudio.currentTime = 0;
+            currentAudio = null;
+        }
+        document.getElementById('audioIndicator').classList.remove('active');
+    }
+
+    function autoPlayAudio() {
+        if (audioMap[currentPage]) {
+            playTimeout = setTimeout(() => {
+                currentAudio = new Audio(audioMap[currentPage]);
+                
+                currentAudio.addEventListener('playing', () => {
+                    document.getElementById('audioIndicator').classList.add('active');
+                });
+                
+                currentAudio.addEventListener('ended', () => {
+                    document.getElementById('audioIndicator').classList.remove('active');
+                });
+
+                currentAudio.play().catch(e => {
+                    console.log("Autoplay prevented by browser:", e);
+                    document.getElementById('audioIndicator').classList.remove('active');
+                });
+            }, 500);
+        }
+    }
+
+    function nextPage() {
+        if (currentPage < totalPages) {
+            stopAudio();
+            currentPage++;
+            playTransitionSound();
+            updatePage();
+            autoPlayAudio();
+        }
+    }
+
+    function prevPage() {
+        if (currentPage > 0) {
+            stopAudio();
+            currentPage--;
+            playTransitionSound();
+            updatePage();
+            autoPlayAudio();
+        }
+    }
+
+    function updatePage() {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(`page-${currentPage}`).classList.add('active');
+        document.getElementById('progress').style.width = `${(currentPage / totalPages) * 100}%`;
+        
+        // 표지(0)를 제외하고 1부터 카운팅하여 1/5 형태로 표시
+        const displayPage = currentPage === 0 ? 1 : currentPage;
+        document.getElementById('pageCounter').innerText = `${displayPage} / ${totalPages}`;
+        
+        const navBar = document.getElementById('navBar');
+        // 첫 커버 페이지(0)와 마지막 페이지(5)에서는 네비게이션 바 숨김
+        navBar.style.display = (currentPage === 0 || currentPage === totalPages) ? 'none' : 'flex';
+        
+        document.getElementById('prevBtn').disabled = (currentPage === 1);
+        document.getElementById('nextBtn').disabled = (currentPage === totalPages);
+
+        // 마지막 페이지에 도달했을 때 레슨 완료 처리 이벤트 발생
+        if (currentPage === totalPages && !window.lessonCompleted) {
+            window.lessonCompleted = true;
+            if (successSynth) {
+                const now = Tone.now();
+                successSynth.triggerAttackRelease("C5", "8n", now);
+                successSynth.triggerAttackRelease("E5", "8n", now + 0.15);
+                successSynth.triggerAttackRelease("G5", "8n", now + 0.3);
+                successSynth.triggerAttackRelease("C6", "2n", now + 0.45);
+            }
+            window.parent.postMessage({ type: 'lesson_complete' }, '*');
+        }
+    }
+</script>
+
+</body>
+</html>
