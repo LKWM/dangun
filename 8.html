@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>단군신화 제8장: 간접화법</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4a3728;
+            --secondary: #d4a373;
+            --accent: #bc6c25;
+            --bg-light: #fefae0;
+            --highlight: #e63946;
+        }
+        body, html {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #1a1a1a;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: none;
+        }
+        #app-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 100vh * (16/9); 
+            aspect-ratio: 16/9;
+            background-color: var(--bg-light);
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        @media (max-aspect-ratio: 1/1) {
+            #app-container {
+                aspect-ratio: 9/16;
+                max-width: 100vw;
+                max-height: calc(100vw * (16/9));
+            }
+        }
+
+        .page {
+            display: none;
+            flex: 1;
+            padding: clamp(0.5rem, 2vh, 2rem) clamp(1rem, 4vw, 3rem);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            animation: fadeIn 0.4s ease-out;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            overflow: hidden;
+            gap: clamp(0.5rem, 1.5vh, 1.5rem);
+        }
+        .page.active { display: flex; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .text-fluid-lg { font-size: clamp(1.2rem, 3vh, 2rem); line-height: 1.4; }
+        .text-fluid-md { font-size: clamp(1rem, 2.5vh, 1.5rem); line-height: 1.5; }
+        .text-fluid-sm { font-size: clamp(0.85rem, 2vh, 1.1rem); line-height: 1.6; }
+        .text-fluid-xs { font-size: clamp(0.7rem, 1.5vh, 0.95rem); line-height: 1.4; }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            padding: clamp(0.5rem, 1.5vh, 1rem) clamp(1rem, 3vw, 2rem);
+            border-radius: 9999px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            font-size: clamp(0.9rem, 2vh, 1.2rem);
+            cursor: pointer;
+            border: none;
+        }
+        .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(74, 55, 40, 0.3); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* 단일 퀴즈 옵션 스타일 (강제 균형 레이아웃) */
+        .quiz-options-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: clamp(0.5rem, 1.5vh, 1rem);
+            width: 100%;
+            max-width: 650px;
+        }
+        .quiz-option {
+            flex: 0 1 calc(50% - 0.5rem); /* 기본 모바일 2열 */
+            width: 100%;
+            padding: clamp(0.6rem, 1.5vh, 1.2rem) 0.5rem;
+            background: white;
+            border: 2px solid var(--secondary);
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: clamp(0.9rem, 2vh, 1.2rem);
+            color: var(--primary);
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .quiz-option:hover:not(.correct):not(.wrong) { background: #fef3c7; }
+        .quiz-option.correct { background: #4ade80; border-color: #22c55e; color: white; pointer-events: none; }
+        .quiz-option.wrong { background: #f87171; border-color: #ef4444; color: white; }
+
+        @media (min-width: 500px) {
+            .quiz-option { flex: 0 1 calc(33.333% - 0.67rem); }
+            .quiz-options-wrapper:has(> .quiz-option:nth-child(4):last-child) .quiz-option {
+                flex: 0 1 calc(50% - 0.5rem); 
+            }
+        }
+
+        .progress-bar {
+            height: clamp(4px, 1vh, 8px);
+            background: rgba(0,0,0,0.05);
+            width: 100%;
+            position: absolute; top: 0; left: 0; z-index: 10;
+        }
+        .progress-inner { height: 100%; background: var(--accent); transition: width 0.3s ease; }
+
+        .highlight-text { color: var(--highlight); font-weight: 800; }
+
+        .grammar-card {
+            background: white;
+            padding: clamp(0.8rem, 2vh, 1.5rem);
+            border-radius: 1rem;
+            border: 2px solid var(--secondary);
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .example-box {
+            width: 100%;
+            max-width: 650px;
+            padding: clamp(0.8rem, 2vh, 1.5rem);
+            background: rgba(255,255,255,0.7);
+            border-radius: 1rem;
+            text-align: center;
+            align-items: center;
+            border-left: 4px solid var(--accent);
+            border-right: 4px solid var(--accent);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        /* 멀티 퀴즈 컨테이너 - 텍스트 내용에 맞게 크기 축소 */
+        .multi-quiz-container {
+            width: 100%;
+            max-width: 750px;
+            text-align: center;
+            padding: clamp(1rem, 2vh, 1.5rem);
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid rgba(212, 163, 115, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: auto; 
+        }
+
+        .word-slot {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            min-width: 3em;
+            height: 1.5em;
+            border-bottom: 2px solid var(--primary);
+            margin: 0 0.2em;
+            color: var(--accent);
+            font-weight: 800;
+            cursor: pointer;
+            vertical-align: middle;
+            background: rgba(0,0,0,0.03);
+            border-radius: 4px 4px 0 0;
+            transition: all 0.2s;
+            padding: 0 0.3em;
+            line-height: 1;
+            font-size: inherit; 
+        }
+        .word-slot:hover:not(.correct) { background: rgba(0,0,0,0.08); }
+        .word-slot.filled { border-bottom: none; background: #e2e8f0; border-radius: 4px; color: var(--primary); }
+        .word-slot.correct { background: #dcfce7; color: #166534; pointer-events: none; border-bottom: none; }
+        .word-slot.wrong { background: #fee2e2; color: #991b1b; animation: shake 0.4s; border-bottom: none; }
+        
+        .word-btn {
+            padding: clamp(0.4rem, 1.5vh, 0.6rem) clamp(0.8rem, 2vw, 1.2rem);
+            background: white;
+            border: 2px solid var(--secondary);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--primary);
+            transition: all 0.2s;
+            font-size: clamp(0.9rem, 2vh, 1.1rem);
+        }
+        .word-btn:hover:not(.used) { background: #fef3c7; border-color: var(--accent); transform: translateY(-2px); }
+        .word-btn.used { opacity: 0; visibility: hidden; pointer-events: none; transform: scale(0.8); }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* 퀴즈 하단 영역 (마진 사전 확보를 통한 레이아웃 잘림 방지) */
+        .quiz-bottom-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            margin-top: clamp(0.5rem, 1.5vh, 1rem);
+            gap: clamp(0.5rem, 1vh, 1rem);
+            /* 번역창이 나오더라도 밀리지 않도록 충분한 높이를 미리 계산하여 확보 */
+            min-height: 180px; 
+        }
+
+        .quiz-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: clamp(0.5rem, 1vh, 1rem);
+            width: 100%;
+            transition: opacity 0.3s ease;
+        }
+
+        .quiz-controls.hidden-state {
+            display: none; /* 정답시 완전히 사라짐 */
+        }
+
+        .translation-box-new {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            opacity: 0;
+            /* 처음부터 자리를 차지하고 있게 만들어 레이아웃 점프를 원천 차단 */
+            visibility: hidden; 
+            transition: opacity 0.4s ease;
+        }
+
+        .translation-box-new.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .translation-content {
+            background: #f8fafc;
+            border: 2px solid var(--secondary);
+            border-left: 4px solid var(--primary);
+            padding: clamp(0.8rem, 1.5vh, 1.2rem) clamp(1rem, 2vw, 1.5rem);
+            font-size: clamp(0.85rem, 2vh, 1.1rem);
+            color: #475569;
+            border-radius: 0.5rem;
+            text-align: center;
+            max-width: 700px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .nav-text { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+        
+        .audio-playing-indicator {
+            position: absolute; top: 20px; right: 20px;
+            display: flex; gap: 3px; align-items: flex-end; height: 15px;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .audio-playing-indicator.active { opacity: 0.5; }
+        .bar { width: 3px; background: var(--primary); animation: sound 0px -800ms linear infinite alternate; }
+        @keyframes sound { 0% { height: 3px; } 100% { height: 15px; } }
+        .bar:nth-child(1) { animation-duration: 474ms; }
+        .bar:nth-child(2) { animation-duration: 433ms; }
+        .bar:nth-child(3) { animation-duration: 407ms; }
+
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    <div class="progress-bar"><div id="progress" class="progress-inner" style="width: 0%"></div></div>
+    
+    <div class="audio-playing-indicator" id="audioIndicator">
+        <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+    </div>
+
+    <!-- Cover (0) -->
+    <div class="page active" id="page-0">
+        <div class="mb-2 text-accent font-bold tracking-widest text-sm uppercase">단군신화 Le mythe de Dangun</div>
+        <h1 class="text-4xl md:text-6xl font-bold text-primary mb-4 leading-tight">Grammaire:<br>Discours direct &<br>discours indirect</h1>
+        <button onclick="nextPage()" class="btn-primary mt-8">
+            Commencer <i class="ph ph-arrow-right text-xl"></i>
+        </button>
+    </div>
+
+    <!-- Page 1 (1) -->
+    <div class="page" id="page-1">
+        <div class="text-fluid-lg font-medium text-primary leading-relaxed max-w-2xl">
+            Bonjour ! On se retrouve ! Avez-vous aimé l'histoire de Dangun ? Dans cette leçon, nous allons réviser le discours direct et le discours indirect, qui sont les notions les plus importantes de ce programme.
+        </div>
+    </div>
+
+    <!-- Page 2 (2) -->
+    <div class="page" id="page-2">
+        <div class="grammar-card">
+            <h2 class="text-fluid-lg font-bold text-primary mb-1">‘N’(이)라는</h2>
+            <p class="text-fluid-xs text-gray-500 italic">qui s’appelle/qui est nommé(e) « N »</p>
+        </div>
+        <p class="text-fluid-sm text-gray-700 max-w-2xl">
+            Le suffixe « (이)라는 » est attaché à un nom pour modifier le nom qui le suit et présenter un nouveau personnage.
+        </p>
+        <div class="example-box mt-2">
+            <p class="text-fluid-md font-medium text-gray-800">옛날 하늘나라에는 <span class="highlight-text">'환인'이라는 왕</span>이 있었습니다.</p>
+            <p class="text-fluid-xs text-gray-500 italic">Autrefois, dans le royaume céleste, il y avait <span class="highlight-text">un roi nommé « Hwanin »</span>.</p>
+        </div>
+    </div>
+
+    <!-- Page 3 (3) -->
+    <div class="page" id="page-3">
+        <div class="example-box">
+            <p class="text-fluid-md font-medium text-gray-800">사람이 된 곰은 <span class="highlight-text">'웅녀'라는 이름</span>을 얻게 되었습니다.</p>
+            <p class="text-fluid-xs text-gray-500 italic">L'ours devenu humain a fini par obtenir <span class="highlight-text">le nom d’ « Ungnyeo »</span>.</p>
+        </div>
+        <div class="example-box">
+            <p class="text-fluid-md font-medium text-gray-800">세월이 흘러 주나라에서 <span class="highlight-text">'기자'라는 사람</span>이 오자, …</p>
+            <p class="text-fluid-xs text-gray-500 italic">Au fil du temps, lorsque <span class="highlight-text">quelqu'un nommé « Gija »</span> est arrivé de la dynastie Zhou, …</p>
+        </div>
+    </div>
+
+    <!-- Page 4 (4) Quiz -->
+    <div class="page" id="page-4">
+        <h3 class="text-fluid-md font-bold text-primary mb-2">Choisissez la bonne réponse.</h3>
+        <p class="text-lg md:text-xl text-primary font-bold italic mb-6">J’apprends le coréen avec un professeur qui s’appelle Min.</p>
+        <div class="text-fluid-lg font-bold text-gray-800 mb-6 bg-white py-4 px-6 rounded-xl shadow-sm border border-gray-100">
+            ____ 선생님에게 한국어를 배워요.
+        </div>
+        <div class="quiz-options-wrapper">
+            <button onclick="checkQuiz(this, false, 4)" class="quiz-option">‘민’라는</button>
+            <button onclick="checkQuiz(this, true, 4)" class="quiz-option">‘민’이라는</button>
+            <button onclick="checkQuiz(this, false, 4)" class="quiz-option">‘민’이름은</button>
+            <button onclick="checkQuiz(this, false, 4)" class="quiz-option">‘민’이라고</button>
+            <button onclick="checkQuiz(this, false, 4)" class="quiz-option">‘민’부르는</button>
+        </div>
+    </div>
+
+    <!-- Page 5 (5) Quiz -->
+    <div class="page" id="page-5">
+        <h3 class="text-fluid-md font-bold text-primary mb-2">Choisissez la bonne réponse.</h3>
+        <p class="text-lg md:text-xl text-primary font-bold italic mb-6">J'écoute une chanson d'une chanteuse appelée Jenny.</p>
+        <div class="text-fluid-lg font-bold text-gray-800 mb-6 bg-white py-4 px-6 rounded-xl shadow-sm border border-gray-100">
+            ____ 가수의 노래를 들어요.
+        </div>
+        <div class="quiz-options-wrapper">
+            <button onclick="checkQuiz(this, false, 5)" class="quiz-option">‘제니’다고</button>
+            <button onclick="checkQuiz(this, false, 5)" class="quiz-option">‘제니’이라고</button>
+            <button onclick="checkQuiz(this, true, 5)" class="quiz-option">‘제니’라는</button>
+            <button onclick="checkQuiz(this, false, 5)" class="quiz-option">‘제니’의</button>
+            <button onclick="checkQuiz(this, false, 5)" class="quiz-option">‘제니’는</button>
+        </div>
+    </div>
+
+    <!-- Page 6 (6) -->
+    <div class="page" id="page-6">
+        <div class="grammar-card">
+            <h2 class="text-fluid-lg font-bold text-primary mb-1">‘N’(이)라고 V</h2>
+            <p class="text-fluid-xs text-gray-500 italic">V + « N »</p>
+        </div>
+        <p class="text-fluid-sm text-gray-700 max-w-2xl">
+            Lorsqu’un nom est suivi d'un verbe comme « 짓다 » (nommer) ou « 부르다 » (appeler), on utilise la particule « 라고 » qui sert à la citation directe.
+        </p>
+        <div class="example-box mt-2">
+            <p class="text-fluid-md font-medium text-gray-800">이 아들의 이름을 <span class="highlight-text">'단군왕검'이라고 지었습니다</span>.</p>
+            <p class="text-fluid-xs text-gray-500 italic">ils <span class="highlight-text">ont nommé ce fils « Dangun Wanggeom »</span>.</p>
+        </div>
+        <div class="example-box">
+            <p class="text-fluid-md font-medium text-gray-800">단군왕검은 나라를 세워 <span class="highlight-text">'조선'이라고 불렀습니다</span>.</p>
+            <p class="text-fluid-xs text-gray-500 italic">Dangun Wanggeom a fondé un pays et <span class="highlight-text">l'a appelé « Joseon »</span>.</p>
+        </div>
+    </div>
+
+    <!-- Page 7 (7) Quiz -->
+    <div class="page" id="page-7">
+        <h3 class="text-fluid-md font-bold text-primary mb-2">Choisissez la bonne réponse.</h3>
+        <p class="text-lg md:text-xl text-primary font-bold italic mb-6">Je m’appelle Sohee.</p>
+        <div class="text-fluid-lg font-bold text-gray-800 mb-6 bg-white py-4 px-6 rounded-xl shadow-sm border border-gray-100">
+            저는 ____ 해요.
+        </div>
+        <div class="quiz-options-wrapper">
+            <button onclick="checkQuiz(this, false, 7)" class="quiz-option">‘소희’라는</button>
+            <button onclick="checkQuiz(this, true, 7)" class="quiz-option">‘소희’라고</button>
+            <button onclick="checkQuiz(this, false, 7)" class="quiz-option">‘소희’이라고</button>
+            <button onclick="checkQuiz(this, false, 7)" class="quiz-option">‘소희’이고</button>
+        </div>
+    </div>
+
+    <!-- Page 8 (8) Quiz -->
+    <div class="page" id="page-8">
+        <h3 class="text-fluid-md font-bold text-primary mb-2">Choisissez la bonne réponse.</h3>
+        <p class="text-lg md:text-xl text-primary font-bold italic mb-6">Il est marqué « Entrée ».</p>
+        <div class="text-fluid-lg font-bold text-gray-800 mb-6 bg-white py-4 px-6 rounded-xl shadow-sm border border-gray-100">
+            ‘입구’__ 써 있어요.
+        </div>
+        <div class="quiz-options-wrapper">
+            <button onclick="checkQuiz(this, false, 8)" class="quiz-option">라며</button>
+            <button onclick="checkQuiz(this, false, 8)" class="quiz-option">라는</button>
+            <button onclick="checkQuiz(this, true, 8)" class="quiz-option">라고</button>
+            <button onclick="checkQuiz(this, false, 8)" class="quiz-option">는</button>
+            <button onclick="checkQuiz(this, false, 8)" class="quiz-option">가</button>
+        </div>
+    </div>
+
+    <!-- Page 9 (9) -->
+    <div class="page" id="page-9">
+        <div class="grammar-card">
+            <h2 class="text-fluid-lg font-bold text-primary mb-1">“Phrase”라고 V</h2>
+            <p class="text-fluid-xs text-gray-500 italic">V « N »</p>
+        </div>
+        <p class="text-fluid-sm text-gray-700 max-w-2xl">
+            On utilise également la même particule « 라고 » pour citer une phrase entière. Dans ce cas, la phrase citée rapporte les propos exacts sans changer le sujet. À l'écrit, on la met entre doubles apostrophes.
+        </p>
+        <div class="example-box mt-2">
+            <p class="text-fluid-md font-medium text-gray-800">곰과 호랑이는 매일 환웅을 찾아가 <span class="highlight-text">"사람이 되고 싶어요"라고 간절히 빌었습니다</span>.</p>
+            <p class="text-fluid-xs text-gray-500 italic">L'ours et le tigre allaient voir Hwanung chaque jour, et <span class="highlight-text">priaient ardemment : « Nous voulons devenir des humains ».</span></p>
+        </div>
+    </div>
+
+    <!-- Page 10 (10) -->
+    <div class="page" id="page-10">
+        <div class="example-box">
+            <p class="text-fluid-md font-medium text-gray-800">환웅은 "이 쑥과 마늘을 먹으며 100일 동안 햇빛을 보지 마라"<span class="highlight-text">라고 말했습니다</span>.</p>
+            <p class="text-fluid-xs text-gray-500 italic">Hwanung <span class="highlight-text">a dit</span> : « En mangeant ces armoises et ces têtes d’ail, ne regardez pas la lumière du soleil pendant 100 jours. »</p>
+        </div>
+        <div class="example-box">
+            <p class="text-fluid-md font-medium text-gray-800">"그러면 너희는 진짜 사람의 모습이 될 수 있다"<span class="highlight-text">라고 약속했습니다</span>.</p>
+            <p class="text-fluid-xs text-gray-500 italic">Il <span class="highlight-text">a promis</span> : « Alors, vous pourrez prendre l'apparence de vrais humains. »</p>
+        </div>
+    </div>
+
+    <!-- Page 11 (11) Quiz -->
+    <div class="page" id="page-11">
+        <h3 class="text-fluid-md font-bold text-primary mb-2">Choisissez la bonne réponse.</h3>
+        <p class="text-lg md:text-xl text-primary font-bold italic mb-6">Mon ami a dit : "On se voit demain".</p>
+        <div class="text-fluid-lg font-bold text-gray-800 mb-6 bg-white py-4 px-6 rounded-xl shadow-sm border border-gray-100">
+            친구가 __________ 말했어요.
+        </div>
+        <div class="quiz-options-wrapper">
+            <button onclick="checkQuiz(this, false, 11)" class="quiz-option">“내일 만나자”라는</button>
+            <button onclick="checkQuiz(this, false, 11)" class="quiz-option">« 내일 만나자 »라고</button>
+            <button onclick="checkQuiz(this, true, 11)" class="quiz-option">“내일 만나자”라고</button>
+            <button onclick="checkQuiz(this, false, 11)" class="quiz-option">내일 만나자고</button>
+        </div>
+    </div>
+
+    <!-- Page 12 (12) Quiz -->
+    <div class="page" id="page-12">
+        <h3 class="text-fluid-md font-bold text-primary mb-2">Choisissez la bonne réponse.</h3>
+        <p class="text-lg md:text-xl text-primary font-bold italic mb-6">Le professeur a dit : "Soyez silencieux".</p>
+        <div class="text-fluid-lg font-bold text-gray-800 mb-6 bg-white py-4 px-6 rounded-xl shadow-sm border border-gray-100">
+            선생님이 ____________ 하셨어요.
+        </div>
+        <div class="quiz-options-wrapper">
+            <button onclick="checkQuiz(this, false, 12)" class="quiz-option">“조용히 하라고”</button>
+            <button onclick="checkQuiz(this, true, 12)" class="quiz-option">“조용히 하세요”라고</button>
+            <button onclick="checkQuiz(this, false, 12)" class="quiz-option">“조용히 하다”고</button>
+            <button onclick="checkQuiz(this, false, 12)" class="quiz-option">“조용히 하세요”이라고</button>
+        </div>
+    </div>
+
+    <!-- Page 13 (13) Multi Quiz 1 -->
+    <div class="page" id="page-13">
+        <h3 class="text-fluid-md font-bold text-primary mb-4">Complétez les phrases avec les mots appropriés.</h3>
+        
+        <div class="multi-quiz-container" id="multi-quiz-13">
+            <div class="text-fluid-lg font-medium text-gray-800 leading-loose text-center">
+                저는 ‘기생충’ <span class="word-slot" data-index="0" onclick="removeWord(13, 0)"></span> 영화를 좋아해요. 이 영화에는 ‘연교’ <span class="word-slot" data-index="1" onclick="removeWord(13, 1)"></span> 인물이 나와요. 사람들은 연교를 ‘사모님’ <span class="word-slot" data-index="2" onclick="removeWord(13, 2)"></span> 불러요. 연교는 “서류는 필요 없어요” <span class="word-slot" data-index="3" onclick="removeWord(13, 3)"></span> 말했어요.
+            </div>
+        </div>
+
+        <div class="quiz-bottom-area">
+            <div class="quiz-controls" id="quiz-controls-13">
+                <div class="word-bank flex flex-wrap justify-center gap-2 w-full max-w-2xl" id="word-bank-13">
+                    <button class="word-btn" onclick="addWord(13, this)">라고</button>
+                    <button class="word-btn" onclick="addWord(13, this)">이라고</button>
+                    <button class="word-btn" onclick="addWord(13, this)">다고</button>
+                    <button class="word-btn" onclick="addWord(13, this)">이라는</button>
+                    <button class="word-btn" onclick="addWord(13, this)">이다고</button>
+                    <button class="word-btn" onclick="addWord(13, this)">라는</button>
+                    <button class="word-btn" onclick="addWord(13, this)">부르는</button>
+                </div>
+                <button class="btn-primary valider-btn" onclick="validateMultiQuiz(13)">Valider</button>
+            </div>
+            
+            <div class="translation-box-new" id="trans-box-13">
+                <div class="translation-content">
+                    <p class="font-bold text-primary mb-1">Traduction :</p>
+                    J'aime le film qui s’appelle Parasite. Dans ce film, il y a un personnage qui s'appelle Yeon-gyo. Les gens l'appellent « Madame ». Yeon-gyo a dit : « Je n’ai pas besoin de documents. »
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page 14 (14) -->
+    <div class="page" id="page-14">
+        <div class="grammar-card">
+            <h2 class="text-fluid-lg font-bold text-primary mb-1">V + ㄴ(는)다고</h2>
+            <p class="text-fluid-xs text-gray-500 italic">.. que + V</p>
+        </div>
+        <p class="text-fluid-sm text-gray-700 max-w-2xl">
+            Pour citer indirectement une phrase, on ajoute « ㄴ » ou « 는 » au radical du verbe. Dans ce cas, il faut adapter le sujet et le temps au point de vue du locuteur.
+        </p>
+        <div class="example-box mt-2">
+            <p class="text-fluid-md font-medium text-gray-800">호랑이는 마늘을 <span class="highlight-text">싫어한다고</span> 했어요.</p>
+            <p class="text-fluid-xs text-gray-500 italic">Le tigre a dit <span class="highlight-text">qu'il n'aimait pas</span> l'ail.</p>
+        </div>
+    </div>
+
+    <!-- Page 15 (15) -->
+    <div class="page" id="page-15">
+        <div class="example-box">
+            <p class="text-fluid-md font-medium text-gray-800">곰은 매일 쑥을 <span class="highlight-text">먹는다고</span> 했어요.</p>
+            <p class="text-fluid-xs text-gray-500 italic">L'ourse a dit <span class="highlight-text">qu'elle mangeait</span> de l'armoise tous les jours.</p>
+        </div>
+        <div class="example-box">
+            <p class="text-fluid-md font-medium text-gray-800">호랑이와 곰은 동굴에서 <span class="highlight-text">산다고</span> 했어요.</p>
+            <p class="text-fluid-xs text-gray-500 italic">Le tigre et l'ours ont dit <span class="highlight-text">qu'ils vivaient</span> dans la grotte.</p>
+        </div>
+    </div>
+
+    <!-- Page 16 (16) Quiz -->
+    <div class="page" id="page-16">
+        <h3 class="text-fluid-md font-bold text-primary mb-2">Choisissez la bonne réponse.</h3>
+        <p class="text-lg md:text-xl text-primary font-bold italic mb-6">Mon ami dit toujours qu'il adore les films coréens.</p>
+        <div class="text-fluid-lg font-bold text-gray-800 mb-6 bg-white py-4 px-6 rounded-xl shadow-sm border border-gray-100">
+            제 친구는 한국 영화를 _____ 항상 말해요.
+        </div>
+        <div class="quiz-options-wrapper">
+            <button onclick="checkQuiz(this, false, 16)" class="quiz-option">좋다고</button>
+            <button onclick="checkQuiz(this, true, 16)" class="quiz-option">좋아한다고</button>
+            <button onclick="checkQuiz(this, false, 16)" class="quiz-option">좋아하다고</button>
+            <button onclick="checkQuiz(this, false, 16)" class="quiz-option">좋아다고</button>
+            <button onclick="checkQuiz(this, false, 16)" class="quiz-option">좋아하라고</button>
+        </div>
+    </div>
+
+    <!-- Page 17 (17) Quiz -->
+    <div class="page" id="page-17">
+        <h3 class="text-fluid-md font-bold text-primary mb-2">Choisissez la bonne réponse.</h3>
+        <p class="text-lg md:text-xl text-primary font-bold italic mb-6">Le footballeur a expliqué dans une interview qu'il s'entraînait cinq heures par jour.</p>
+        <div class="text-fluid-lg font-bold text-gray-800 mb-6 bg-white py-4 px-6 rounded-xl shadow-sm border border-gray-100">
+            축구 선수는 인터뷰에서 하루에 다섯 시간씩 _____ 밝혔어요.
+        </div>
+        <div class="quiz-options-wrapper">
+            <button onclick="checkQuiz(this, false, 17)" class="quiz-option">연습이라고</button>
+            <button onclick="checkQuiz(this, false, 17)" class="quiz-option">연습하라고</button>
+            <button onclick="checkQuiz(this, true, 17)" class="quiz-option">연습한다고</button>
+            <button onclick="checkQuiz(this, false, 17)" class="quiz-option">연습하다고</button>
+            <button onclick="checkQuiz(this, false, 17)" class="quiz-option">연습이라는</button>
+        </div>
+    </div>
+
+    <!-- Page 18 (18) -->
+    <div class="page" id="page-18">
+        <div class="grammar-card">
+            <h2 class="text-fluid-lg font-bold text-primary mb-1">ADJ/-었-/-겠- +다고</h2>
+            <p class="text-fluid-xs text-gray-500 italic">… que + ADJ/V(passé/futur)</p>
+        </div>
+        <p class="text-fluid-sm text-gray-700 max-w-2xl">
+            Si le prédicat de la phrase citée est un adjectif, ou bien un verbe au passé ou au futur, on ajoute directement « 다고 » au radical sans utiliser « 는 ».
+        </p>
+        <div class="example-box mt-2">
+            <p class="text-fluid-md font-medium text-gray-800">그의 나이는 무려 1,908세<span class="highlight-text">였다고</span> 전해집니다.</p>
+            <p class="text-fluid-xs text-gray-500 italic">On raconte <span class="highlight-text">q'il avait</span> pas moins de 1 908 ans.</p>
+        </div>
+    </div>
+
+    <!-- Page 19 (19) -->
+    <div class="page" id="page-19">
+        <div class="example-box">
+            <p class="text-fluid-md font-medium text-gray-800">환웅은 사람이 되는 것은 <span class="highlight-text">쉽지 않다고</span> 했어요.</p>
+            <p class="text-fluid-xs text-gray-500 italic">Hwanung a dit <span class="highlight-text">que ce n'est pas facile</span> de devenir humain.</p>
+        </div>
+        <div class="example-box">
+            <p class="text-fluid-md font-medium text-gray-800">곰이 사람이 <span class="highlight-text">됐다고</span> 들었어요.</p>
+            <p class="text-fluid-xs text-gray-500 italic">J'ai entendu dire que l'ours <span class="highlight-text">s'était transformé</span> en humain.</p>
+        </div>
+        <div class="example-box">
+            <p class="text-fluid-md font-medium text-gray-800">호랑이는 <span class="highlight-text">그만두겠다고</span> 했어요.</p>
+            <p class="text-fluid-xs text-gray-500 italic">Le tigre a déclaré <span class="highlight-text">qu'il allait abandonner</span>.</p>
+        </div>
+    </div>
+
+    <!-- Page 20 (20) Quiz -->
+    <div class="page" id="page-20">
+        <h3 class="text-fluid-md font-bold text-primary mb-2">Choisissez la bonne réponse.</h3>
+        <p class="text-lg md:text-xl text-primary font-bold italic mb-6">Le professeur dit toujours qu'il est important de mémoriser le vocabulaire.</p>
+        <div class="text-fluid-lg font-bold text-gray-800 mb-6 bg-white py-4 px-6 rounded-xl shadow-sm border border-gray-100">
+            선생님은 단어를 외우는 것이 _____ 항상 말해요.
+        </div>
+        <div class="quiz-options-wrapper">
+            <button onclick="checkQuiz(this, false, 20)" class="quiz-option">중요한다고</button>
+            <button onclick="checkQuiz(this, true, 20)" class="quiz-option">중요하다고</button>
+            <button onclick="checkQuiz(this, false, 20)" class="quiz-option">중요하라고</button>
+            <button onclick="checkQuiz(this, false, 20)" class="quiz-option">중요하는다고</button>
+            <button onclick="checkQuiz(this, false, 20)" class="quiz-option">중요이라고</button>
+        </div>
+    </div>
+
+    <!-- Page 21 (21) Quiz -->
+    <div class="page" id="page-21">
+        <h3 class="text-fluid-md font-bold text-primary mb-2">Choisissez la bonne réponse.</h3>
+        <p class="text-lg md:text-xl text-primary font-bold italic mb-6">Promettez-moi que vous étudierez sérieusement à partir de demain.</p>
+        <div class="text-fluid-lg font-bold text-gray-800 mb-6 bg-white py-4 px-6 rounded-xl shadow-sm border border-gray-100">
+            내일부터 열심히 ______ 약속하세요.
+        </div>
+        <div class="quiz-options-wrapper">
+            <button onclick="checkQuiz(this, false, 21)" class="quiz-option">공부한다고</button>
+            <button onclick="checkQuiz(this, false, 21)" class="quiz-option">공부하다고</button>
+            <button onclick="checkQuiz(this, true, 21)" class="quiz-option">공부하겠다고</button>
+            <button onclick="checkQuiz(this, false, 21)" class="quiz-option">공부했다고</button>
+            <button onclick="checkQuiz(this, false, 21)" class="quiz-option">공부하라고</button>
+        </div>
+    </div>
+
+    <!-- Page 22 (22) -->
+    <div class="page" id="page-22">
+        <div class="grammar-card">
+            <h2 class="text-fluid-lg font-bold text-primary mb-1">V + (으)라고</h2>
+            <p class="text-fluid-xs text-gray-500 italic">.. que/de + V</p>
+        </div>
+        <p class="text-fluid-sm text-gray-700 max-w-2xl">
+            Lorsque la phrase citée est un ordre, une demande ou une suggestion dont le sujet est une autre personne, on utilise « 라고 » au lieu de « 다고 ».
+        </p>
+        <div class="example-box mt-2">
+            <p class="text-fluid-md font-medium text-gray-800">환인은 인간 세상을 <span class="highlight-text">다스리라고</span> 했습니다.</p>
+            <p class="text-fluid-xs text-gray-500 italic">Hwanin a lui demandé <span class="highlight-text">de gouverner</span> le monde des humains.</p>
+        </div>
+    </div>
+
+    <!-- Page 23 (23) -->
+    <div class="page" id="page-23">
+        <div class="example-box">
+            <p class="text-fluid-md font-medium text-gray-800">웅녀는 아기를 <span class="highlight-text">갖게해 달라고</span> 기도했습니다.</p>
+            <p class="text-fluid-xs text-gray-500 italic">Ungnyeo priait pour <span class="highlight-text">qu'on lui donne</span> un bébé.</p>
+        </div>
+        <div class="example-box">
+            <p class="text-fluid-md font-medium text-gray-800">환웅은 100일 동안 햇빛을 <span class="highlight-text">보지 말라고</span> 명령했습니다.</p>
+            <p class="text-fluid-xs text-gray-500 italic">Hwanung leur <span class="highlight-text">a ordonné de ne pas voir</span> la lumière du soleil pendant 100 jours.</p>
+        </div>
+    </div>
+
+    <!-- Page 24 (24) Quiz -->
+    <div class="page" id="page-24">
+        <h3 class="text-fluid-md font-bold text-primary mb-2">Choisissez la bonne réponse.</h3>
+        <p class="text-lg md:text-xl text-primary font-bold italic mb-6">Le médecin m'a dit de prendre des médicaments deux fois par jour.</p>
+        <div class="text-fluid-lg font-bold text-gray-800 mb-6 bg-white py-4 px-6 rounded-xl shadow-sm border border-gray-100">
+            의사가 하루에 두 번 약을 ____ 했어요.
+        </div>
+        <div class="quiz-options-wrapper">
+            <button onclick="checkQuiz(this, false, 24)" class="quiz-option">먹는다고</button>
+            <button onclick="checkQuiz(this, false, 24)" class="quiz-option">먹었다고</button>
+            <button onclick="checkQuiz(this, true, 24)" class="quiz-option">먹으라고</button>
+            <button onclick="checkQuiz(this, false, 24)" class="quiz-option">먹겠다고</button>
+            <button onclick="checkQuiz(this, false, 24)" class="quiz-option">먹어라고</button>
+            <button onclick="checkQuiz(this, false, 24)" class="quiz-option">먹이라고</button>
+        </div>
+    </div>
+
+    <!-- Page 25 (25) Quiz -->
+    <div class="page" id="page-25">
+        <h3 class="text-fluid-md font-bold text-primary mb-2">Choisissez la bonne réponse.</h3>
+        <p class="text-lg md:text-xl text-primary font-bold italic mb-6">Mon ami m'a recommandé de regarder ce film.</p>
+        <div class="text-fluid-lg font-bold text-gray-800 mb-6 bg-white py-4 px-6 rounded-xl shadow-sm border border-gray-100">
+            친구가 이 영화를 ___ 추천했어요.
+        </div>
+        <div class="quiz-options-wrapper">
+            <button onclick="checkQuiz(this, false, 25)" class="quiz-option">보자고</button>
+            <button onclick="checkQuiz(this, false, 25)" class="quiz-option">본다고</button>
+            <button onclick="checkQuiz(this, true, 25)" class="quiz-option">보라고</button>
+            <button onclick="checkQuiz(this, false, 25)" class="quiz-option">볼 거라고</button>
+            <button onclick="checkQuiz(this, false, 25)" class="quiz-option">보겠다고</button>
+            <button onclick="checkQuiz(this, false, 25)" class="quiz-option">봤다고</button>
+        </div>
+    </div>
+
+    <!-- Page 26 (26) Multi Quiz 2 -->
+    <div class="page" id="page-26">
+        <h3 class="text-fluid-md font-bold text-primary mb-4">Complétez les phrases avec les mots appropriés.</h3>
+        
+        <div class="multi-quiz-container" id="multi-quiz-26">
+            <div class="text-fluid-lg font-medium text-gray-800 leading-loose text-center">
+                저는 얼마전에 ‘킹덤’ <span class="word-slot" data-index="0" onclick="removeWord(26, 0)"></span> 드라마를 봤어요. 처음에는 잘 몰랐는데 친구가 꼭 <span class="word-slot" data-index="1" onclick="removeWord(26, 1)"></span> 추천해 줬어요. 친구는 벌써 세 번을 <span class="word-slot" data-index="2" onclick="removeWord(26, 2)"></span> 했어요. 그리고 “새로운 시즌이 나오면 같이 보자.” <span class="word-slot" data-index="3" onclick="removeWord(26, 3)"></span> 말했어요.
+            </div>
+        </div>
+
+        <div class="quiz-bottom-area">
+            <div class="quiz-controls" id="quiz-controls-26">
+                <div class="word-bank flex flex-wrap justify-center gap-2 w-full max-w-2xl" id="word-bank-26">
+                    <button class="word-btn" onclick="addWord(26, this)">이라고</button>
+                    <button class="word-btn" onclick="addWord(26, this)">라고</button>
+                    <button class="word-btn" onclick="addWord(26, this)">본다고</button>
+                    <button class="word-btn" onclick="addWord(26, this)">봤다고</button>
+                    <button class="word-btn" onclick="addWord(26, this)">이라는</button>
+                    <button class="word-btn" onclick="addWord(26, this)">본다는</button>
+                    <button class="word-btn" onclick="addWord(26, this)">보라고</button>
+                    <button class="word-btn" onclick="addWord(26, this)">보겠다고</button>
+                    <button class="word-btn" onclick="addWord(26, this)">라는</button>
+                </div>
+                <button class="btn-primary valider-btn" onclick="validateMultiQuiz(26)">Valider</button>
+            </div>
+            
+            <div class="translation-box-new" id="trans-box-26">
+                <div class="translation-content">
+                    <p class="font-bold text-primary mb-1">Traduction :</p>
+                    Récemment, j'ai regardé une série nommée Kingdom. Au début, je ne la connaissais pas bien, mais un ami m'a vivement recommandé de le regarder. Il m'a dit qu'il l'avait déjà vu trois fois, et a ajouté : « Regardons ensemble si une nouvelle saison sort. »
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Outro (27) -->
+    <div class="page" id="page-27">
+        <i class="ph ph-confetti text-6xl text-accent mb-4"></i>
+        <h2 class="text-fluid-lg font-bold text-primary mb-4">Félicitations !</h2>
+        <div class="bg-white p-5 md:p-8 rounded-2xl shadow-sm border border-secondary w-full max-w-2xl flex flex-col gap-3 items-center text-center">
+            <p class="text-fluid-sm text-gray-800 leading-snug m-0">
+                Vous avez terminé le programme « Le mythe de Dangun ».
+            </p>
+            <p class="text-fluid-sm text-gray-800 leading-snug m-0">
+                Le discours direct et le discours indirect appris dans ce programme peuvent sembler un peu difficiles au début, mais vous vous y habituerez facilement en lisant et en écoutant beaucoup de textes et d'histoires. Si la grammaire vous semble encore un peu floue, n'hésitez pas à retourner à la première leçon pour écouter l'histoire une nouvelle fois ! Vous la comprendrez beaucoup plus facilement qu'au début.
+            </p>
+            <p class="text-fluid-sm text-gray-800 leading-snug m-0">
+                Merci pour tous vos efforts jusqu'ici, et à très bientôt dans un autre programme.
+            </p>
+            <span class="font-bold text-primary text-fluid-md block mt-1">안녕히 가세요!</span>
+        </div>
+    </div>
+
+    <!-- Nav -->
+    <div id="navBar" class="mt-auto p-4 flex justify-between items-center bg-white border-t border-gray-200 z-20 w-full" style="display:none;">
+        <button id="prevBtn" onclick="prevPage()" class="flex flex-col items-center text-primary disabled:opacity-20 px-4">
+            <i class="ph ph-caret-left text-2xl"></i>
+            <span class="nav-text">Précédent</span>
+        </button>
+        <span id="pageCounter" class="text-sm font-bold text-gray-400">1 / 28</span>
+        <button id="nextBtn" onclick="nextPage()" class="flex flex-col items-center text-primary disabled:opacity-20 px-4">
+            <i class="ph ph-caret-right text-2xl"></i>
+            <span class="nav-text">Suivant</span>
+        </button>
+    </div>
+</div>
+
+<script>
+    let currentPage = 0;
+    const totalPages = 27;
+    let currentAudio = null;
+    let synth, successSynth, failSynth;
+    let playTimeout = null;
+
+    const quizPages = [4, 5, 7, 8, 11, 12, 16, 17, 20, 21, 24, 25];
+    let quizState = {}; 
+
+    let multiQuizState = {
+        13: { fails: 0, passed: false },
+        26: { fails: 0, passed: false }
+    };
+
+    const multiQuizAnswers = {
+        13: ["이라는", "라는", "이라고", "라고"],
+        26: ["이라는", "보라고", "봤다고", "라고"]
+    };
+
+    const audioMap = {
+        1: 'https://res.cloudinary.com/de76i94ia/video/upload/v1774288641/8-1-final_c47j5r.mp3',
+        2: 'https://res.cloudinary.com/de76i94ia/video/upload/v1774288649/8-2-final_f0ch9b.mp3',
+        6: 'https://res.cloudinary.com/de76i94ia/video/upload/v1774288653/8-3-final_cjgwzw.mp3',
+        9: 'https://res.cloudinary.com/de76i94ia/video/upload/v1774288644/8-4-final_pg3yud.mp3',
+        14: 'https://res.cloudinary.com/de76i94ia/video/upload/v1774288658/8-5-final_m19yao.mp3',
+        18: 'https://res.cloudinary.com/de76i94ia/video/upload/v1774288663/8-6-final_dbwroj.mp3',
+        22: 'https://res.cloudinary.com/de76i94ia/video/upload/v1774288668/8-7-final_fwcnjl.mp3',
+        27: 'https://res.cloudinary.com/de76i94ia/video/upload/v1774288673/8-8-final_tr8ucy.mp3'
+    };
+
+    window.onload = function() {
+        synth = new Tone.Synth().toDestination();
+        successSynth = new Tone.PolySynth().toDestination();
+        failSynth = new Tone.Synth({ oscillator: { type: "square" } }).toDestination();
+        updatePage();
+    };
+
+    function playTransitionSound() {
+        if(synth) synth.triggerAttackRelease("C6", "32n", "+0", 0.05);
+    }
+
+    function stopAudio() {
+        if (playTimeout) {
+            clearTimeout(playTimeout);
+            playTimeout = null;
+        }
+        if (currentAudio) {
+            currentAudio.pause();
+            currentAudio.currentTime = 0;
+            currentAudio = null;
+        }
+        document.getElementById('audioIndicator').classList.remove('active');
+    }
+
+    function autoPlayAudio() {
+        if (audioMap[currentPage]) {
+            playTimeout = setTimeout(() => {
+                currentAudio = new Audio(audioMap[currentPage]);
+                
+                currentAudio.addEventListener('playing', () => {
+                    document.getElementById('audioIndicator').classList.add('active');
+                });
+                
+                currentAudio.addEventListener('ended', () => {
+                    document.getElementById('audioIndicator').classList.remove('active');
+                });
+
+                currentAudio.play().catch(e => {
+                    console.log("Autoplay prevented by browser:", e);
+                    document.getElementById('audioIndicator').classList.remove('active');
+                });
+            }, 500);
+        }
+    }
+
+    function nextPage() {
+        if (currentPage < totalPages) {
+            stopAudio();
+            currentPage++;
+            playTransitionSound();
+            updatePage();
+            autoPlayAudio();
+        }
+    }
+
+    function prevPage() {
+        if (currentPage > 0) {
+            stopAudio();
+            currentPage--;
+            playTransitionSound();
+            updatePage();
+            autoPlayAudio();
+        }
+    }
+
+    function updatePage() {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(`page-${currentPage}`).classList.add('active');
+        document.getElementById('progress').style.width = `${(currentPage / totalPages) * 100}%`;
+        document.getElementById('pageCounter').innerText = `${currentPage + 1} / ${totalPages + 1}`;
+        
+        const navBar = document.getElementById('navBar');
+        navBar.style.display = (currentPage === 0 || currentPage === totalPages) ? 'none' : 'flex';
+        
+        document.getElementById('prevBtn').disabled = (currentPage === 0);
+        
+        let canGoNext = true;
+        if (quizPages.includes(currentPage) && !quizState[currentPage]) {
+            canGoNext = false;
+        } else if ((currentPage === 13 || currentPage === 26) && !multiQuizState[currentPage].passed) {
+            canGoNext = false;
+        } else if (currentPage === totalPages) {
+            canGoNext = false;
+        }
+        
+        document.getElementById('nextBtn').disabled = !canGoNext;
+
+        if (currentPage === totalPages && !window.lessonCompleted) {
+            window.lessonCompleted = true;
+            if (successSynth) {
+                const now = Tone.now();
+                successSynth.triggerAttackRelease("C5", "8n", now);
+                successSynth.triggerAttackRelease("E5", "8n", now + 0.15);
+                successSynth.triggerAttackRelease("G5", "8n", now + 0.3);
+                successSynth.triggerAttackRelease("C6", "2n", now + 0.45);
+            }
+            window.parent.postMessage({ type: 'lesson_complete' }, '*');
+        }
+    }
+
+    function checkQuiz(btn, isCorrect, pageId) {
+        if (quizState[pageId]) return; 
+
+        if (isCorrect) {
+            btn.classList.add('correct');
+            if (successSynth) successSynth.triggerAttackRelease(["C5", "E5", "G5"], "8n");
+            
+            quizState[pageId] = true; 
+            document.getElementById('nextBtn').disabled = false; 
+        } else {
+            btn.classList.add('wrong');
+            if (failSynth) failSynth.triggerAttackRelease("C3", "8n", "+0", 0.5);
+            setTimeout(() => btn.classList.remove('wrong'), 800);
+        }
+    }
+
+    function addWord(pageId, btnElement) {
+        if (btnElement.classList.contains('used')) return;
+
+        const container = document.getElementById(`multi-quiz-${pageId}`);
+        const slots = container.querySelectorAll('.word-slot');
+        const word = btnElement.innerText;
+
+        for (let slot of slots) {
+            if (!slot.innerText) {
+                slot.innerText = word;
+                slot.dataset.btnIndex = Array.from(btnElement.parentNode.children).indexOf(btnElement);
+                slot.classList.add('filled');
+                btnElement.classList.add('used');
+                break;
+            }
+        }
+    }
+
+    function removeWord(pageId, slotIndex) {
+        const container = document.getElementById(`multi-quiz-${pageId}`);
+        const slot = container.querySelector(`.word-slot[data-index="${slotIndex}"]`);
+        
+        if (slot.classList.contains('correct')) return; 
+        
+        if (slot.innerText) {
+            const btnIndex = slot.dataset.btnIndex;
+            const btn = document.getElementById(`word-bank-${pageId}`).children[btnIndex];
+            if(btn) btn.classList.remove('used');
+            
+            slot.innerText = '';
+            slot.classList.remove('filled', 'wrong');
+            delete slot.dataset.btnIndex;
+        }
+    }
+
+    function validateMultiQuiz(pageId) {
+        if (multiQuizState[pageId].passed) return;
+
+        const container = document.getElementById(`multi-quiz-${pageId}`);
+        const slots = container.querySelectorAll('.word-slot');
+        const answers = multiQuizAnswers[pageId];
+        
+        let allFilled = true;
+        slots.forEach(slot => { if (!slot.innerText) allFilled = false; });
+        
+        if (!allFilled) {
+            if(failSynth) failSynth.triggerAttackRelease("C3", "8n", "+0", 0.3);
+            return;
+        }
+
+        let allCorrect = true;
+        let anyWrong = false;
+
+        slots.forEach((slot, index) => {
+            if (slot.classList.contains('correct')) return;
+            
+            if (slot.innerText === answers[index]) {
+                slot.classList.remove('wrong');
+                slot.classList.add('correct');
+            } else {
+                allCorrect = false;
+                anyWrong = true;
+                slot.classList.add('wrong');
+                
+                setTimeout(() => {
+                    removeWord(pageId, index);
+                }, 800);
+            }
+        });
+
+        if (allCorrect) {
+            multiQuizState[pageId].passed = true;
+            if (successSynth) successSynth.triggerAttackRelease(["C5", "E5", "G5"], "8n");
+            document.getElementById('nextBtn').disabled = false;
+            
+            document.getElementById(`quiz-controls-${pageId}`).classList.add('hidden-state');
+            document.getElementById(`trans-box-${pageId}`).classList.add('show');
+        } else {
+            if (anyWrong) {
+                if(failSynth) failSynth.triggerAttackRelease("C3", "8n", "+0", 0.5);
+                multiQuizState[pageId].fails++;
+                if (multiQuizState[pageId].fails >= 2) {
+                    document.getElementById(`trans-box-${pageId}`).classList.add('show');
+                }
+            }
+        }
+    }
+</script>
+
+</body>
+</html>
